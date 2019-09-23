@@ -1,0 +1,6 @@
+C:\Users\kotaro\Documents\Visual Studio 2015\Projects\PokemonGCRNGLibrary\PokemonGCRNGLibrary\bin\Release\PokemonGCRNGLibrary.dll
+C:\Users\kotaro\Documents\Visual Studio 2015\Projects\PokemonGCRNGLibrary\PokemonGCRNGLibrary\bin\Release\PokemonGCRNGLibrary.pdb
+C:\Users\kotaro\Documents\Visual Studio 2015\Projects\PokemonGCRNGLibrary\PokemonGCRNGLibrary\obj\Release\PokemonGCRNGLibrary.csprojAssemblyReference.cache
+C:\Users\kotaro\Documents\Visual Studio 2015\Projects\PokemonGCRNGLibrary\PokemonGCRNGLibrary\obj\Release\PokemonGCRNGLibrary.csproj.CoreCompileInputs.cache
+C:\Users\kotaro\Documents\Visual Studio 2015\Projects\PokemonGCRNGLibrary\PokemonGCRNGLibrary\obj\Release\PokemonGCRNGLibrary.dll
+C:\Users\kotaro\Documents\Visual Studio 2015\Projects\PokemonGCRNGLibrary\PokemonGCRNGLibrary\obj\Release\PokemonGCRNGLibrary.pdb
