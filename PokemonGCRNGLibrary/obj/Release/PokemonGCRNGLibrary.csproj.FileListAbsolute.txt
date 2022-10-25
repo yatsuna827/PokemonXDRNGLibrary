@@ -4,3 +4,14 @@ C:\Users\kotaro\Documents\Visual Studio 2015\Projects\PokemonGCRNGLibrary\Pokemo
 C:\Users\kotaro\Documents\Visual Studio 2015\Projects\PokemonGCRNGLibrary\PokemonGCRNGLibrary\obj\Release\PokemonGCRNGLibrary.csproj.CoreCompileInputs.cache
 C:\Users\kotaro\Documents\Visual Studio 2015\Projects\PokemonGCRNGLibrary\PokemonGCRNGLibrary\obj\Release\PokemonGCRNGLibrary.dll
 C:\Users\kotaro\Documents\Visual Studio 2015\Projects\PokemonGCRNGLibrary\PokemonGCRNGLibrary\obj\Release\PokemonGCRNGLibrary.pdb
+C:\Users\yatsu\Documents\develop\cs\PokemonCORNGLibrary\PokemonGCRNGLibrary\bin\Release\PokemonGCRNGLibrary.dll
+C:\Users\yatsu\Documents\develop\cs\PokemonCORNGLibrary\PokemonGCRNGLibrary\bin\Release\PokemonGCRNGLibrary.pdb
+C:\Users\yatsu\Documents\develop\cs\PokemonCORNGLibrary\PokemonGCRNGLibrary\obj\Release\PokemonGCRNGLibrary.csprojAssemblyReference.cache
+C:\Users\yatsu\Documents\develop\cs\PokemonCORNGLibrary\PokemonGCRNGLibrary\obj\Release\PokemonGCRNGLibrary.csproj.CoreCompileInputs.cache
+C:\Users\yatsu\Documents\develop\cs\PokemonCORNGLibrary\PokemonGCRNGLibrary\obj\Release\PokemonGCRNGLibrary.dll
+C:\Users\yatsu\Documents\develop\cs\PokemonCORNGLibrary\PokemonGCRNGLibrary\obj\Release\PokemonGCRNGLibrary.pdb
+C:\Users\yatsu\Documents\develop\cs\PokemonCORNGLibrary\PokemonGCRNGLibrary\bin\Release\PokemonPRNG.dll
+C:\Users\yatsu\Documents\develop\cs\PokemonCORNGLibrary\PokemonGCRNGLibrary\bin\Release\PokemonPRNG.pdb
+C:\Users\yatsu\Documents\develop\cs\PokemonCORNGLibrary\PokemonGCRNGLibrary\obj\Release\PokemonGCRNGLibrary.csproj.CopyComplete
+C:\Users\yatsu\Documents\develop\cs\PokemonCORNGLibrary\PokemonGCRNGLibrary\obj\Release\PokemonGCRNGLibrary.Properties.Resources.resources
+C:\Users\yatsu\Documents\develop\cs\PokemonCORNGLibrary\PokemonGCRNGLibrary\obj\Release\PokemonGCRNGLibrary.csproj.GenerateResource.cache

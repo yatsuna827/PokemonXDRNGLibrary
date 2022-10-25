@@ -6,14 +6,59 @@ using System.Threading.Tasks;
 
 namespace PokemonGCRNGLibrary
 {
-
     public enum Nature
     {
-        Hardy, Lonely, Brave, Adamant, Naughty,
-        Bold, Docile, Relaxed, Impish, Lax,
-        Timid, Hasty, Serious, Jolly, Naive,
-        Modest, Mild, Quiet, Bashful, Rash,
-        Calm, Gentle, Sassy, Careful, Quirky, other
+        /// <summary> がんばりや </summary>
+        Hardy,
+        /// <summary> さみしがり </summary>
+        Lonely,
+        /// <summary> ゆうかん </summary>
+        Brave,
+        /// <summary> いじっぱり </summary>
+        Adamant,
+        /// <summary> やんちゃ </summary>
+        Naughty,
+        /// <summary> ずぶとい </summary>
+        Bold,
+        /// <summary> すなお </summary>
+        Docile,
+        /// <summary> のんき </summary>
+        Relaxed,
+        /// <summary> わんぱく </summary>
+        Impish,
+        /// <summary> のうてんき </summary>
+        Lax,
+        /// <summary> おくびょう </summary>
+        Timid,
+        /// <summary> せっかち </summary>
+        Hasty,
+        /// <summary> まじめ </summary>
+        Serious,
+        /// <summary> ようき </summary>
+        Jolly,
+        /// <summary> むじゃき </summary>
+        Naive,
+        /// <summary> ひかえめ </summary>
+        Modest,
+        /// <summary> おっとり </summary>
+        Mild,
+        /// <summary> れいせい </summary>
+        Quiet,
+        /// <summary> てれや </summary>
+        Bashful,
+        /// <summary> うっかりや </summary>
+        Rash,
+        /// <summary> おだやか </summary>
+        Calm,
+        /// <summary> おとなしい </summary>
+        Gentle,
+        /// <summary> なまいき </summary>
+        Sassy,
+        /// <summary> しんちょう </summary>
+        Careful,
+        /// <summary> きまぐれ </summary>
+        Quirky,
+        other
     }
     public enum Gender { Genderless, Male, Female }
     public enum GenderRatio : uint
@@ -30,6 +75,22 @@ namespace PokemonGCRNGLibrary
     {
         Normal, Fire, Water, Grass, Electric, Ice, Fighting, Poison,
         Ground, Flying, Psychic, Bug, Rock, Ghost, Dragon, Dark, Steel, Non
+    }
+    public enum PlayerTeam
+    {
+        Mewtwo,
+        Mew,
+        Deoxys,
+        Rayquaza,
+        Jirachi
+    }
+    public enum COMTeam
+    {
+        Articuno,
+        Zapdos,
+        Moltres,
+        Kangaskhan,
+        Latias
     }
     public static class EnumExtention
     {
@@ -71,8 +132,18 @@ namespace PokemonGCRNGLibrary
                 new double[] { 1, 1, 1, 1, 1, 1 },
                 new double[] { 1, 1, 1, 1, 1, 1 }
             };
+        static private readonly string[] PokeType_Kanji = new string[]
+        {
+            "普","炎","水","草","電","氷","闘","毒","地","飛","超","虫","岩","霊","龍","悪","鋼","Error"
+        };
+        static private readonly string[] PokeType_JP = new string[]
+        {
+            "ノーマル","ほのお","みず","くさ","でんき","こおり","かくとう","どく","じめん","ひこう","エスパー","むし","いわ","ゴースト","ドラゴン","あく","はがね","---"
+        };
         static public Gender Reverse(this Gender gender) { if (gender == Gender.Male) return Gender.Female; else if (gender == Gender.Female) return Gender.Male; else return Gender.Genderless; }
 
+        public static string ToKanji(this PokeType pokeType) { return PokeType_Kanji[(int)pokeType]; }
+        public static string ToJapanese(this PokeType pokeType) { return PokeType_JP[(int)pokeType]; }
         public static string ToJapanese(this Nature nature) { return Nature_JP[(int)nature]; }
         public static double[] ToMagnification(this Nature nature) { return Magnifications[(int)nature]; }
         public static string ToSymbol(this Gender gender) { if (gender == Gender.Male) return "♂"; else if (gender == Gender.Female) return "♀"; else return "-"; }

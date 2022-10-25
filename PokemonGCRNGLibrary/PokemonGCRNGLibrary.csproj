@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PokemonPRNG, Version=3.5.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PokemonPRNG.3.5.3\lib\netstandard2.0\PokemonPRNG.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -41,14 +44,46 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
-    <Compile Include="IGenerator.cs" />
-    <Compile Include="Individual.cs" />
-    <Compile Include="IndivKernel.cs" />
-    <Compile Include="LCGModules.cs" />
+    <Compile Include="BattleNow.cs" />
+    <Compile Include="CalcBackCell.cs" />
+    <Compile Include="CORNGSystem.cs" />
+    <Compile Include="COStarter.cs" />
+    <Compile Include="COTest.cs" />
+    <Compile Include="Criteria.cs" />
+    <Compile Include="DarkPokemon.cs" />
+    <Compile Include="GCIndividual.cs" />
+    <Compile Include="GCSlot.cs" />
+    <Compile Include="IGeneratable.cs" />
+    <Compile Include="IrregularAdvanceCounter.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="other.cs" />
     <Compile Include="Pokemon.cs" />
+    <Compile Include="PokeSpotGenerator.cs" />
+    <Compile Include="PreGenerateSlot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="QuickBattle.cs" />
+    <Compile Include="Result.cs" />
+    <Compile Include="RNGTarget.cs" />
+    <Compile Include="SeedFinder.cs" />
+    <Compile Include="XDQuickBattleSeedSearch.cs" />
+    <Compile Include="XDRNGSystem.cs" />
+    <Compile Include="XDStarter.cs" />
+    <Compile Include="XDTradePokemon.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="Resources\XDDB.bin" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace PokemonGCRNGLibrary
 {
-    interface IGenerator
+    interface IGeneratable<TResult>
     {
-        IndivKernel Generate(uint seed);
+        TResult Generate(uint seed);
+        TResult Generate(uint seed, out uint finishingSeed);
     }
 }
