@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PokemonStandardLibrary;
 
 namespace PokemonGCRNGLibrary
 {
@@ -58,7 +59,7 @@ namespace PokemonGCRNGLibrary
         public string ability="";
         public Gender gender;
 
-        public PokeType HiddenPowerType = PokeType.Non;
+        public PokeType HiddenPowerType = PokeType.None;
         public uint MinHiddenPower = 30;
     }
 }

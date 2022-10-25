@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PokemonPRNG.LCG32.GCLCG;
+using PokemonStandardLibrary;
 
 namespace PokemonGCRNGLibrary
 {
@@ -91,7 +92,7 @@ namespace PokemonGCRNGLibrary
             {
                 PID = seed.GetPID(_ => (FixedGender == Gender.Genderless || _.GetGender(pokemon.GenderRatio) == FixedGender) && (FixedNature == Nature.other || (Nature)(_ % 25) == FixedNature));
 
-                if (!PID.isShiny(TSV)) break;
+                if (!PID.IsShiny(TSV)) break;
             }
 
             finSeed = seed;

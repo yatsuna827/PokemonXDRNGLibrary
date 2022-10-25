@@ -31,8 +31,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PokemonPRNG, Version=3.5.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\PokemonPRNG.3.5.3\lib\netstandard2.0\PokemonPRNG.dll</HintPath>
+    <Reference Include="PokemonPRNG, Version=3.5.9.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PokemonPRNG.3.5.9\lib\netstandard2.0\PokemonPRNG.dll</HintPath>
+    </Reference>
+    <Reference Include="PokemonStandardLibrary, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PokemonStandardLibrary.1.4.0\lib\netstandard2.0\PokemonStandardLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="PokemonStandardLibrary.Gen3, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PokemonStandardLibrary.Gen3.1.2.0\lib\netstandard2.0\PokemonStandardLibrary.Gen3.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -44,20 +50,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BattleNow.cs" />
     <Compile Include="CalcBackCell.cs" />
-    <Compile Include="CORNGSystem.cs" />
-    <Compile Include="COStarter.cs" />
-    <Compile Include="COTest.cs" />
     <Compile Include="Criteria.cs" />
     <Compile Include="DarkPokemon.cs" />
     <Compile Include="GCIndividual.cs" />
     <Compile Include="GCSlot.cs" />
     <Compile Include="IGeneratable.cs" />
     <Compile Include="IrregularAdvanceCounter.cs" />
-    <Compile Include="Logger.cs" />
     <Compile Include="other.cs" />
-    <Compile Include="Pokemon.cs" />
     <Compile Include="PokeSpotGenerator.cs" />
     <Compile Include="PreGenerateSlot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

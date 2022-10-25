@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PokemonPRNG.LCG32.GCLCG;
+using PokemonStandardLibrary;
+using PokemonStandardLibrary.Gen3;
 
 namespace PokemonGCRNGLibrary
 {
@@ -37,8 +39,8 @@ namespace PokemonGCRNGLibrary
             {
                 PID = seed.GetPID(_ => (FixedGender == Gender.Genderless || _.GetGender(pokemon.GenderRatio) == FixedGender) && (FixedNature == Nature.other || (Nature)(_ % 25) == FixedNature));
 
-                shinySkip |= PID.isShiny(TSV);
-                if (!PID.isShiny(TSV)) break;
+                shinySkip |= PID.IsShiny(TSV);
+                if (!PID.IsShiny(TSV)) break;
             }
 
             finSeed = seed;
@@ -51,7 +53,7 @@ namespace PokemonGCRNGLibrary
             uint[] IVs = seed.GetIVs();
             if (!criteria.CheckIVs(IVs)) return GCIndividual.Empty;
             uint AbilityIndex = seed.GetRand(2);
-            if (!criteria.CheckAbility(pokemon.Ability[AbilityIndex])) return GCIndividual.Empty;
+            if (!criteria.CheckAbility(pokemon.Ability[(int)AbilityIndex])) return GCIndividual.Empty;
             uint PID;
             while (true)
             {
@@ -62,7 +64,7 @@ namespace PokemonGCRNGLibrary
             var indiv = pokemon.GetIndividual(PID, Lv, IVs, AbilityIndex);
             if (!criteria.CheckGender(indiv.Gender)) return GCIndividual.Empty;
             if (!criteria.CheckNature(indiv.Nature)) return GCIndividual.Empty;
-            if (!criteria.CheckShiny(indiv.isShiny(criteria.TSV))) return GCIndividual.Empty;
+            if (!criteria.CheckShiny(indiv.PID.IsShiny(criteria.TSV))) return GCIndividual.Empty;
             if (!criteria.CheckHiddenPowerType(indiv.HiddenPowerType)) return GCIndividual.Empty;
             if (!criteria.CheckHiddenPowerPower(indiv.HiddenPower)) return GCIndividual.Empty;
 
@@ -75,18 +77,18 @@ namespace PokemonGCRNGLibrary
             uint[] IVs = seed.GetIVs();
             if (!criteria.CheckIVs(IVs)) return GCIndividual.Empty;
             uint AbilityIndex = seed.GetRand(2);
-            if (!criteria.CheckAbility(pokemon.Ability[AbilityIndex])) return GCIndividual.Empty;
+            if (!criteria.CheckAbility(pokemon.Ability[(int)AbilityIndex])) return GCIndividual.Empty;
             uint PID;
             while (true)
             {
                 PID = seed.GetPID(_ => (FixedGender == Gender.Genderless || _.GetGender(pokemon.GenderRatio) == FixedGender) && (FixedNature == Nature.other || (Nature)(_ % 25) == FixedNature));
 
-                if (!PID.isShiny(TSV)) break;
+                if (!PID.IsShiny(TSV)) break;
             }
             var indiv = pokemon.GetIndividual(PID, Lv, IVs, AbilityIndex);
             if (!criteria.CheckGender(indiv.Gender)) return GCIndividual.Empty;
             if (!criteria.CheckNature(indiv.Nature)) return GCIndividual.Empty;
-            if (!criteria.CheckShiny(indiv.isShiny(criteria.TSV))) return GCIndividual.Empty;
+            if (!criteria.CheckShiny(indiv.PID.IsShiny(criteria.TSV))) return GCIndividual.Empty;
             if (!criteria.CheckHiddenPowerType(indiv.HiddenPowerType)) return GCIndividual.Empty;
             if (!criteria.CheckHiddenPowerPower(indiv.HiddenPower)) return GCIndividual.Empty;
 
@@ -104,7 +106,7 @@ namespace PokemonGCRNGLibrary
             {
                 PID = seed.GetPID(_ => (FixedGender == Gender.Genderless || _.GetGender(pokemon.GenderRatio) == FixedGender) && (FixedNature == Nature.other || (Nature)(_ % 25) == FixedNature));
 
-                if (!PID.isShiny(TSV)) break;
+                if (!PID.IsShiny(TSV)) break;
             }
             uint[] EVs = seed.GenerateEVs();
             return pokemon.GetIndividual(PID, 100, IVs, EVs, AbilityIndex).SetRepSeed(rep);
@@ -160,7 +162,7 @@ namespace PokemonGCRNGLibrary
                 SCD & 0x1f
             };
         }
-        public static bool isShiny(this uint PID, uint TSV) { return ((PID & 0xFFFF) ^ (PID >> 16) ^ TSV) < 8; }
+        public static bool IsShiny(this uint PID, uint TSV) { return ((PID & 0xFFFF) ^ (PID >> 16) ^ TSV) < 8; }
         public static Gender GetGender(this uint PID, GenderRatio ratio)
         {
             if (ratio == GenderRatio.Genderless) return Gender.Genderless;

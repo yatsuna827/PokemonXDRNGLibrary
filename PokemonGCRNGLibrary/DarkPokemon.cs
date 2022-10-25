@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using PokemonPRNG.LCG32.GCLCG;
+using PokemonStandardLibrary;
 
 namespace PokemonGCRNGLibrary
 {
@@ -159,7 +160,7 @@ namespace PokemonGCRNGLibrary
 
             for (int k = 0; k < seedList.Length; k++)
             {
-                if (criteria.HiddenPowerType != PokeType.Non && resList[k].targetIndividual.HiddenPowerType != criteria.HiddenPowerType) continue;
+                if (criteria.HiddenPowerType != PokeType.None && resList[k].targetIndividual.HiddenPowerType != criteria.HiddenPowerType) continue;
                 if (resList[k].targetIndividual.HiddenPower < criteria.MinHiddenPower) continue;
                 if (criteria.ability != "" && resList[k].targetIndividual.Ability != criteria.ability) continue;
                 if (criteria.gender != Gender.Genderless && resList[k].targetIndividual.Gender != criteria.gender) continue;

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PokemonPRNG.LCG32.GCLCG;
+using PokemonStandardLibrary;
+using PokemonStandardLibrary.Gen3;
 
 namespace PokemonGCRNGLibrary
 {
@@ -41,7 +43,7 @@ namespace PokemonGCRNGLibrary
         public virtual Nature Nature { get { return Individual.Nature; } }
         public virtual string Ability { get { return Individual.Ability; } }
         public virtual Gender Gender { get { return Individual.Gender; } }
-        public virtual bool isShiny(uint TSV) { return Individual.isShiny(TSV); }
+        public virtual bool isShiny(uint TSV) { return Individual.PID.IsShiny(TSV); }
         public GCIndividual Generate(uint seed)
         {
             seed.Advance(4);
@@ -83,7 +85,7 @@ namespace PokemonGCRNGLibrary
             this.PID = PID;
             Slot = slot;
             if(slot != null)
-            Individual = slot.pokemon.GetIndividual(PID, 1, new uint[6]);
+            Individual = slot.pokemon.GetIndividual(1, new uint[6], PID);
         }
     }
 
