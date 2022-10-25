@@ -7,8 +7,8 @@
     <ProjectGuid>{D9C92987-9E40-446A-93B7-867BF7434EC1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PokemonGCRNGLibrary</RootNamespace>
-    <AssemblyName>PokemonGCRNGLibrary</AssemblyName>
+    <RootNamespace>PokemonXDRNGLibrary</RootNamespace>
+    <AssemblyName>PokemonXDRNGLibrary</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
