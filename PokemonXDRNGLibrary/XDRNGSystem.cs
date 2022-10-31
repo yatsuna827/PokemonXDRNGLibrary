@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using PokemonPRNG.LCG32.GCLCG;
 using PokemonStandardLibrary;
 
-namespace PokemonGCRNGLibrary
+namespace PokemonXDRNGLibrary
 {
     public static class XDRNGSystem
     {
@@ -85,6 +85,8 @@ namespace PokemonGCRNGLibrary
 
         static XDRNGSystem()
         {
+            // TODO
+            // パラスだったかガーディだったかの設定を間違えていたかも…。
             var xdList = new List<XDDarkPokemon>();
             xdList.Add(new XDDarkPokemon("ヒメグマ", 11));
             xdList.Add(new XDDarkPokemon("レディバ", 10, new PreGenerateSlot[]

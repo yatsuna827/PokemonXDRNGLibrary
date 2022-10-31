@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using PokemonStandardLibrary.Gen3;
 
-namespace PokemonGCRNGLibrary
+namespace PokemonXDRNGLibrary
 {
     public class GCIndividual : Pokemon.Individual
     {

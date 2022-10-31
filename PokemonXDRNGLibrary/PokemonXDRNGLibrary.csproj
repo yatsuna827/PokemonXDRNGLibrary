@@ -55,9 +55,8 @@
     <Compile Include="DarkPokemon.cs" />
     <Compile Include="GCIndividual.cs" />
     <Compile Include="GCSlot.cs" />
-    <Compile Include="IGeneratable.cs" />
     <Compile Include="IrregularAdvanceCounter.cs" />
-    <Compile Include="other.cs" />
+    <Compile Include="QuickBattle\Enums.cs" />
     <Compile Include="PokeSpotGenerator.cs" />
     <Compile Include="PreGenerateSlot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -66,11 +65,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="QuickBattle.cs" />
-    <Compile Include="Result.cs" />
+    <Compile Include="QuickBattle\QuickBattleGenerator.cs" />
     <Compile Include="RNGTarget.cs" />
     <Compile Include="SeedFinder.cs" />
-    <Compile Include="XDQuickBattleSeedSearch.cs" />
+    <Compile Include="QuickBattle\XDDBClient.cs" />
     <Compile Include="XDRNGSystem.cs" />
     <Compile Include="XDStarter.cs" />
     <Compile Include="XDTradePokemon.cs" />

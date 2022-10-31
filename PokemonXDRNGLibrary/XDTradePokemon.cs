@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using PokemonPRNG.LCG32.GCLCG;
 using PokemonStandardLibrary.Gen3;
 
-namespace PokemonGCRNGLibrary
+namespace PokemonXDRNGLibrary
 {
     class XDTradePokemon
     {

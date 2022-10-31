@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using PokemonPRNG.LCG32.GCLCG;
 using PokemonStandardLibrary;
 
-namespace PokemonGCRNGLibrary
+namespace PokemonXDRNGLibrary
 {
     public class PreGenerateSlot : GCSlot
     {

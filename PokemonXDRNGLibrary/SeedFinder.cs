@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using PokemonPRNG.LCG32.GCLCG;
 
-namespace PokemonGCRNGLibrary
+namespace PokemonXDRNGLibrary
 {
     static public class SeedFinder
     {

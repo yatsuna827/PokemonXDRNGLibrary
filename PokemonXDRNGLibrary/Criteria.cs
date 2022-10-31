@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using PokemonStandardLibrary;
 
-namespace PokemonGCRNGLibrary
+namespace PokemonXDRNGLibrary
 {
     public class Criteria
     {

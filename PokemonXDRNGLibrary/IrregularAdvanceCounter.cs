@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using PokemonPRNG.LCG32.GCLCG;
 
-namespace PokemonGCRNGLibrary
+namespace PokemonXDRNGLibrary
 {
     class MainCounter
     {

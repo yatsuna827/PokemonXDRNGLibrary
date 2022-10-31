@@ -4,84 +4,8 @@ using System.Linq;
 using PokemonPRNG.LCG32.GCLCG;
 using PokemonStandardLibrary;
 
-namespace PokemonGCRNGLibrary
+namespace PokemonXDRNGLibrary
 {
-    public class CODarkPokemon
-    {
-        public readonly GCSlot darkPokemon;
-        public readonly IReadOnlyList<PreGenerateSlot> PreGeneratePokemons = new PreGenerateSlot[0];
-
-        internal CODarkPokemon(string name, uint lv)
-        {
-            darkPokemon = new GCSlot(name, lv);
-        }
-        internal CODarkPokemon(string name, uint lv, PreGenerateSlot[] preGenerate)
-        {
-            darkPokemon = new GCSlot(name, lv);
-            PreGeneratePokemons = preGenerate;
-        }
-
-        public virtual GCIndividual Generate(uint seed)
-        {
-            uint DummyTSV = seed.GetRand() ^ seed.GetRand();
-            for (int i = 0; i < PreGeneratePokemons.Count; i++)
-            {
-                PreGeneratePokemons[i].Generate(seed, out seed, DummyTSV);
-            }
-            return darkPokemon.Generate(seed, out seed, DummyTSV);
-        }
-        public virtual GCIndividual Generate(uint seed, Criteria criteria)
-        {
-            uint DummyTSV = seed.GetRand() ^ seed.GetRand();
-            for (int i = 0; i < PreGeneratePokemons.Count; i++)
-            {
-                PreGeneratePokemons[i].Generate(seed, out seed, DummyTSV);
-            }
-            return darkPokemon.Generate(seed, DummyTSV, criteria);
-        }
-
-        public IReadOnlyList<RNGTarget> CalcBack(uint H, uint A, uint B, uint C, uint D, uint S)
-        {
-            var preList = PreGeneratePokemons.Reverse().ToArray();
-            var resList = new List<RNGTarget>();
-
-            var generatingSeedList = SeedFinder.FindGeneratingSeed(H, A, B, C, D, S, false);
-            foreach (var seed in generatingSeedList)
-            {
-                var PSV = (seed.NextSeed(6) >> 16) ^ (seed.NextSeed(7) >> 16); // ダークポケモンのPSV
-                var cells = new List<CalcBackCell>() { new CalcBackCell(seed) };
-
-                // 事前生成されるポケモンの分
-                foreach (var pre in preList)
-                {
-                    var list = new List<CalcBackCell>();
-                    foreach (var cell in cells) list.AddRange(pre.CalcBack(cell));
-
-                    cells = list;
-                }
-
-                // TSV生成の部分.
-                var genSeedList1 = new List<uint>(); // 色回避無し個体
-                var genSeedList2 = new List<uint>(); // 色回避有り個体
-                foreach (var cell in cells)
-                {
-                    var res = cell.GetGeneratableSeed();
-                    if (res.flag)
-                    {
-                        // tsvによって振り分けるようにする; tsv == psvならスキップ個体になる.
-                        if (res.TSV == PSV) genSeedList2.Add(res.seed); else genSeedList1.Add(res.seed);
-                    }
-                }
-
-                if (genSeedList1.Count > 0) resList.Add(new RNGTarget(seed, darkPokemon.Generate(seed, out uint finSeed), genSeedList1.ToArray()));
-                if (genSeedList2.Count > 0) resList.Add(new RNGTarget(seed, darkPokemon.Generate(seed, out uint finSeed, PSV), genSeedList2.ToArray()));
-            }
-
-            return resList;
-        }
-
-    }
-
     public class XDDarkPokemon
     {
         private readonly uint lvBonus;

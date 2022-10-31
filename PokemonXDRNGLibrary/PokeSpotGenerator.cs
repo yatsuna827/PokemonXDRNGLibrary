@@ -7,7 +7,7 @@ using PokemonPRNG.LCG32.GCLCG;
 using PokemonStandardLibrary;
 using PokemonStandardLibrary.Gen3;
 
-namespace PokemonGCRNGLibrary
+namespace PokemonXDRNGLibrary
 {
     class PokeSpotSlot
     {
