@@ -15,9 +15,9 @@ namespace PokemonXDRNGLibrary.QuickBattle
         public QuickBattleSeedSearcher(XDDBClient client, uint tsv = 0x10000)
             => (_client, _tsv) = (client, tsv);
 
-        public IEnumerable<uint> Next(in XDQuickBattleArguments arg)
+        public IEnumerable<uint> Next(in QuickBattleInput input)
         {
-            var (res, next) = _state.Next(arg, _client, _tsv);
+            var (res, next) = _state.Next(input, _client, _tsv);
             _state = next;
 
             return res;
@@ -33,23 +33,23 @@ namespace PokemonXDRNGLibrary.QuickBattle
 
         abstract class State
         {
-            public abstract (IEnumerable<uint> Result, State NextState) Next(in XDQuickBattleArguments arg, XDDBClient client, uint tsv);
+            public abstract (IEnumerable<uint> Result, State NextState) Next(in QuickBattleInput input, XDDBClient client, uint tsv);
         }
 
         class FirstState : State
         {
-            public override (IEnumerable<uint> Result, State NextState) Next(in XDQuickBattleArguments arg, XDDBClient client, uint tsv)
-                => (Array.Empty<uint>(), new SecondState(arg));
+            public override (IEnumerable<uint> Result, State NextState) Next(in QuickBattleInput input, XDDBClient client, uint tsv)
+                => (Array.Empty<uint>(), new SecondState(input));
         }
         class SecondState : State
         {
-            private readonly XDQuickBattleArguments _first;
-            public SecondState(in XDQuickBattleArguments args)
-                => _first = args;
+            private readonly QuickBattleInput _first;
+            public SecondState(in QuickBattleInput inputs)
+                => _first = inputs;
 
-            public override (IEnumerable<uint> Result, State NextState) Next(in XDQuickBattleArguments arg, XDDBClient client, uint tsv)
+            public override (IEnumerable<uint> Result, State NextState) Next(in QuickBattleInput input, XDDBClient client, uint tsv)
             {
-                var res = client.Search(_first, arg);
+                var res = client.Search(_first, input);
                 return (res, new ExtState(res));
             }
         }
@@ -59,18 +59,18 @@ namespace PokemonXDRNGLibrary.QuickBattle
             public ExtState(IEnumerable<uint> seeds)
                 => _seeds = seeds;
 
-            public override (IEnumerable<uint> Result, State NextState) Next(in XDQuickBattleArguments arg, XDDBClient client, uint tsv)
+            public override (IEnumerable<uint> Result, State NextState) Next(in QuickBattleInput input, XDDBClient client, uint tsv)
             {
-                var next = Filter(_seeds, arg, tsv);
+                var next = Filter(_seeds, input, tsv);
                 return (next, new ExtState(next));
             }
 
-            private static IEnumerable<uint> Filter(IEnumerable<uint> seeds, XDQuickBattleArguments arg, uint tsv)
+            private static IEnumerable<uint> Filter(IEnumerable<uint> seeds, QuickBattleInput input, uint tsv)
             {
                 foreach (var seed in seeds)
                 {
                     var (p, e, code, s) = seed.GenerateQuickBattle(tsv);
-                    if (arg.PlayerTeam != p || arg.EnemyTeam != e || arg.HPCode != code) continue;
+                    if (!input.Check(p, e, code)) continue;
 
                     yield return s;
                 }

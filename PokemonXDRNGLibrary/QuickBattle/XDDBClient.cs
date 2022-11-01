@@ -9,7 +9,7 @@ using PokemonPRNG.LCG32;
 
 namespace PokemonXDRNGLibrary.QuickBattle
 {
-    public readonly struct XDQuickBattleArguments
+    public readonly struct QuickBattleInput
     {
         public byte PlayerTeam { get; }
         public byte EnemyTeam { get; }
@@ -34,10 +34,10 @@ namespace PokemonXDRNGLibrary.QuickBattle
             (270, 230),
         };
 
-        public XDQuickBattleArguments(PlayerTeam playerTeam, EnemyTeam comTeam, uint pFirstHP, uint pSecondHP, uint eFirstHP, uint eSecondHP)
+        public QuickBattleInput(PlayerTeam playerTeam, EnemyTeam enemyTeam, uint pFirstHP, uint pSecondHP, uint eFirstHP, uint eSecondHP)
         {
             PlayerTeam = (byte)playerTeam;
-            EnemyTeam = (byte)comTeam;
+            EnemyTeam = (byte)enemyTeam;
             pFirstHP -= pBaseHP[PlayerTeam].First;
             pSecondHP -= pBaseHP[PlayerTeam].Second;
             eFirstHP -= eBaseHP[EnemyTeam].First;
@@ -67,7 +67,7 @@ namespace PokemonXDRNGLibrary.QuickBattle
             (this.hpData, this.seedData) = (hp, seed);
         }
 
-        public IEnumerable<uint> Search(XDQuickBattleArguments first, XDQuickBattleArguments second)
+        public IEnumerable<uint> Search(QuickBattleInput first, QuickBattleInput second)
         {
             var key = first.HPCode;
             var idx = hpData.BinarySearch(key);
