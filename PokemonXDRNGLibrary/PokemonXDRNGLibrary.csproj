@@ -66,6 +66,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="QuickBattle\QuickBattleGenerator.cs" />
+    <Compile Include="QuickBattle\QuickBattleSeedSearcher.cs" />
     <Compile Include="RNGTarget.cs" />
     <Compile Include="SeedFinder.cs" />
     <Compile Include="QuickBattle\XDDBClient.cs" />

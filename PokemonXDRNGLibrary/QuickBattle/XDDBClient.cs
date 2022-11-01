@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using System.Threading.Tasks;
 using PokemonPRNG.LCG32.GCLCG;
+using PokemonPRNG.LCG32;
 
 namespace PokemonXDRNGLibrary.QuickBattle
 {
@@ -78,8 +79,8 @@ namespace PokemonXDRNGLibrary.QuickBattle
                 var seed = seedData[i];
                 for (uint h8 = 0; h8 < 0x100; h8++)
                 {
-                    var res = Generate(h8 << 24 | seed);
-                    var next = Generate(res.seed);
+                    var res = (h8 << 24 | seed).GenerateQuickBattle();
+                    var next = res.seed.GenerateQuickBattle();
 
                     if (!first.Check(res.pIndex, res.eIndex, res.HP)) continue;
                     if (!second.Check(next.pIndex, next.eIndex, next.HP)) continue;
@@ -94,8 +95,8 @@ namespace PokemonXDRNGLibrary.QuickBattle
                 var seed = seedData[i];
                 for (uint h8 = 0; h8 < 0x100; h8++)
                 {
-                    var res = Generate(h8 << 24 | seed);
-                    var next = Generate(res.seed);
+                    var res = (h8 << 24 | seed).GenerateQuickBattle();
+                    var next = res.seed.GenerateQuickBattle();
 
                     if (!first.Check(res.pIndex, res.eIndex, res.HP)) continue;
                     if (!second.Check(next.pIndex, next.eIndex, next.HP)) continue;
@@ -108,63 +109,60 @@ namespace PokemonXDRNGLibrary.QuickBattle
 
         }
 
-        private static (uint pIndex, uint eIndex, uint HP, uint seed) Generate(uint seed)
+    }
+
+    static class EVsExt
+    {
+        public static (uint pIndex, uint eIndex, uint HP, uint seed) GenerateQuickBattle(this uint seed, uint tsv = 0x10000)
         {
             seed.Advance(); // PlaynerName
             var playerTeamIndex = seed.GetRand() % 5;
             var enemyTeamIndex = seed.GetRand() % 5;
 
-            var hp = new uint[4];
-
             seed.Advance();
-            uint EnemyTSV = seed.GetRand() ^ seed.GetRand();
+            var enemyTSV = seed.GetRand() ^ seed.GetRand();
 
             // 相手1匹目
             seed.Advance(); // dummyPID
             seed.Advance(); // dummyPID
-            hp[0] = seed.GetRand() & 0x1F;
+            var hp0 = seed.GetRand() & 0x1F;
             seed.Advance(); // SCD
             seed.Advance(); // Ability
-            while (true) { if ((seed.GetRand() ^ seed.GetRand() ^ EnemyTSV) >= 8) break; }
-            hp[0] += seed.GenerateEVs() / 4;
+            while (true) { if ((seed.GetRand() ^ seed.GetRand() ^ enemyTSV) >= 8) break; }
+            hp0 += seed.GenerateEVs() / 4;
 
             // 相手2匹目
             seed.Advance();
             seed.Advance();
-            hp[1] = seed.GetRand() & 0x1F;
+            var hp1 = seed.GetRand() & 0x1F;
             seed.Advance();
             seed.Advance();
-            while (true) { if ((seed.GetRand() ^ seed.GetRand() ^ EnemyTSV) >= 8) break; }
-            hp[1] += seed.GenerateEVs() / 4;
+            while (true) { if ((seed.GetRand() ^ seed.GetRand() ^ enemyTSV) >= 8) break; }
+            hp1 += seed.GenerateEVs() / 4;
 
-            seed.Advance();
-            uint PlayerTSV = seed.GetRand() ^ seed.GetRand();
+            seed.Advance(3);
 
             // プレイヤー1匹目
             seed.Advance();
             seed.Advance();
-            hp[2] = seed.GetRand() & 0x1F;
+            var hp2 = seed.GetRand() & 0x1F;
             seed.Advance();
             seed.Advance();
-            while (true) { if ((seed.GetRand() ^ seed.GetRand() ^ PlayerTSV) >= 8) break; }
-            hp[2] += seed.GenerateEVs() / 4;
+            while (true) { if ((seed.GetRand() ^ seed.GetRand() ^ tsv) >= 8) break; }
+            hp2 += seed.GenerateEVs() / 4;
 
             // プレイヤー2匹目
             seed.Advance();
             seed.Advance();
-            hp[3] = seed.GetRand() & 0x1F;
+            var hp3 = seed.GetRand() & 0x1F;
             seed.Advance();
             seed.Advance();
-            while (true) { if ((seed.GetRand() ^ seed.GetRand() ^ PlayerTSV) >= 8) break; }
-            hp[3] += seed.GenerateEVs() / 4;
+            while (true) { if ((seed.GetRand() ^ seed.GetRand() ^ tsv) >= 8) break; }
+            hp3 += seed.GenerateEVs() / 4;
 
-            return (playerTeamIndex, enemyTeamIndex, (hp[0] << 24) + (hp[1] << 16) + (hp[2] << 8) + (hp[3]), seed);
+            return (playerTeamIndex, enemyTeamIndex, (hp0 << 24) + (hp1 << 16) + (hp2 << 8) + (hp3), seed);
         }
 
-    }
-
-    static class EVsExt
-    {
         public static void Shave(this byte[] evs)
         {
             var sum = evs.Sum(_ => _);
