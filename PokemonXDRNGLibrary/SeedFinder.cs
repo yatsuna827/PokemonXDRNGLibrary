@@ -11,14 +11,14 @@ namespace PokemonXDRNGLibrary
     static public class SeedFinder//(Co->XD) オプショナル引数も含めてそれらしきマジックナンバーを調整しています.
     {
         static readonly List<uint>[] LOWER;
-        private static readonly int[] minBlinkableBlank;　// randに対し, 「到達したときに瞬きをするような内部カウンタの値」の最小値.
+        private static readonly int[] minBlinkableBlank;　// randに対し, 「到達したときに瞬きをするような内部カウンタの値」の最小値.(Co->XD)瞬きからの特定処理用の変数の追加
 
         static SeedFinder()
         {
             LOWER = Enumerable.Range(0, 0x10000).Select(_ => new List<uint>()).ToArray();
             for (uint y = 0; y < 0x10000; y++) LOWER[y.NextSeed() >> 16].Add(y);
 
-            minBlinkableBlank = Enumerable.Range(0, 0x10000).Select(_ => BlinkConst.blinkThresholds_even.UpperBound((uint)_)).ToArray();
+            minBlinkableBlank = Enumerable.Range(0, 0x10000).Select(_ => BlinkConst.blinkThresholds_even.UpperBound((uint)_)).ToArray(); //(Co->XD)瞬きからの特定処理用の変数の追加
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace PokemonXDRNGLibrary
         /// <param name="allowanceLimitOfError"></param>
         /// <param name="coolTime"></param>
         /// <returns></returns>
-        public static IEnumerable<uint> FindCurrentSeedByBlink(uint seed, uint minIndex, uint maxIndex, int[] blinkInput, int allowanceLimitOfError = 40, int coolTime = 8)//(Co->XD)マジックナンバーの更新
+        public static IEnumerable<uint> FindCurrentSeedByBlink(uint seed, uint minIndex, uint maxIndex, int[] blinkInput, int allowanceLimitOfError = 40, int coolTime = 8)//(Co->XD)メソッドの追加/マジックナンバーを2倍に
         {
             var res = new List<uint>();
 
@@ -69,7 +69,7 @@ namespace PokemonXDRNGLibrary
             var n = maxIndex - minIndex + 1;
 
             // i = maxまで計算できるように, 全て最大間隔で瞬きが行われた場合でも足りるだけ余分に計算しておく.
-            var len = (int)n + 170 * (blinkInput.Length + 1); //(Co->XD)マジックナンバーの更新
+            var len = (int)n + 170 * (blinkInput.Length + 1); //(Co->XD)マジックナンバーを2倍にしつつ(blinkInput.Length + 2)を(blinkInput.Length + 1)へ
 
             // 「到達したときに瞬きをするような内部カウンタの値」の最小値に変換する.
             // UpperBoundしていたところは入力が高々65536通りしかないのであらかじめ計算しておくことでO(1)に落とせる.
@@ -80,7 +80,7 @@ namespace PokemonXDRNGLibrary
             // ここが定数倍大きいのでちょっと辛い.
             var blankList = Enumerable.Repeat(171, len).ToArray(); // 171 = INF (Co->XD)マジックナンバーの更新
             for (int i = len - 1; i >= 0; i--) // 後ろから埋めていく. 確率的にcountListは大きい値が多く, 特に85になる確率が高い.
-                for (int k = countList[i]; k <= Math.Min(i, 170); k++) // kは『到達したときに瞬きするような内部カウンタの最小値』から170まで(境界を超えないように). (Co->XD)マジックナンバーの更新
+                for (int k = countList[i]; k <= Math.Min(i, 170); k++) // kは『到達したときに瞬きするような内部カウンタの最小値』から170まで(境界を超えないように). (Co->XD)マジックナンバーを2倍に
                     blankList[i - k] = Math.Min(blankList[i - k], k); // kの定義より, i-kで瞬きをしたら, 次は少なくともiで瞬きが発生する.
 
             // 『iフレーム目に1回目の瞬きが行われた』と仮定してシミュレート.
@@ -114,7 +114,7 @@ namespace PokemonXDRNGLibrary
         /// <param name="allowanceLimitOfError"></param>
         /// <param name="coolTime"></param>
         /// <returns></returns>
-        public static IEnumerable<uint> FindCurrentSeedByBlinkInBattle(uint seed, uint maxFrame, int[] blinkInput, IActionSequenceEnumeratorHandler handler, int allowanceLimitOfError = 40)//(Co->XD)マジックナンバーの更新
+        public static IEnumerable<uint> FindCurrentSeedByBlinkInBattle(uint seed, uint maxFrame, int[] blinkInput, IActionSequenceEnumeratorHandler handler, int allowanceLimitOfError = 40)//(Co->XD)メソッドの追加/マジックナンバーを2倍に
         {
             var source = seed.EnumerateActionSequence(handler).TakeWhile(_ => _.Frame <= maxFrame);
             var timeline = source.Select(_ => _.Interval).ToArray();
@@ -134,7 +134,7 @@ namespace PokemonXDRNGLibrary
         /// <param name="allowanceLimitOfError"></param>
         /// <param name="coolTime"></param>
         /// <returns></returns>
-        public static IEnumerable<uint> FindCurrentSeedByBlinkFaster(uint seed, uint minIndex, uint maxIndex, int[] blinkInput, int allowanceLimitOfError = 40, int coolTime = 8)//(Co->XD)マジックナンバーの更新
+        public static IEnumerable<uint> FindCurrentSeedByBlinkFaster(uint seed, uint minIndex, uint maxIndex, int[] blinkInput, int allowanceLimitOfError = 40, int coolTime = 8)//(Co->XD)メソッドの追加/マジックナンバーを2倍に
         {
             seed.Advance(minIndex);
 
@@ -177,7 +177,7 @@ namespace PokemonXDRNGLibrary
         /// <param name="allowanceLimitOfError"></param>
         /// <param name="coolTime"></param>
         /// <returns></returns>
-        public static IEnumerable<uint> FindCurrentSeedByBlink(int[] blinkInput, int allowanceLimitOfError = 40, int coolTime = 8)//(Co->XD)マジックナンバーの更新
+        public static IEnumerable<uint> FindCurrentSeedByBlink(int[] blinkInput, int allowanceLimitOfError = 40, int coolTime = 8)//メソッドの追加/(Co->XD)マジックナンバーを2倍に
         {
             var e = 0u.EnumerateBlinkingSeed(coolTime).GetEnumerator();
             var blinkCache = new int[256]; // 瞬き間隔をキャッシュしておく配列.
