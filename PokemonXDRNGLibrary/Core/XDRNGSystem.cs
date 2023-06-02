@@ -528,7 +528,7 @@ namespace PokemonXDRNGLibrary
             }));
 
             XDDarkPokemonList = xdList;
-            XDDarkPokemonDictionary = xdList.ToDictionary(_ => _.darkPokemon.pokemon.Name, _ => _);
+            XDDarkPokemonDictionary = xdList.ToDictionary(_ => _.darkPokemon.Pokemon.Name, _ => _);
         }
     }
 }

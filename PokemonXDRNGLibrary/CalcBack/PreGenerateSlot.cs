@@ -27,7 +27,7 @@ namespace PokemonXDRNGLibrary
                 var pid = hid << 16 | lid;
 
                 if (pid % 25 != (uint)FixedNature) yield break; // 性格不一致
-                if (pid.GetGender(pokemon.GenderRatio) != FixedGender) yield break; // 性別不一致
+                if (pid.GetGender(Pokemon.GenderRatio) != FixedGender) yield break; // 性別不一致
                 if (TSV < 0x10000 && (lid ^ hid ^ TSV) < 8) yield break; // TSVに条件がついているが, そのTSVだと色回避に引っかかってしまう場合
 
                 psvList = new List<uint>(cell.preGeneratedPSVList) { lid ^ hid };
@@ -42,7 +42,7 @@ namespace PokemonXDRNGLibrary
                 var lid = seed.Back() >> 16;
                 var hid = seed.Back() >> 16;
                 var pid = hid << 16 | lid;
-                if (pid % 25 == (uint)FixedNature && pid.GetGender(pokemon.GenderRatio) == FixedGender)
+                if (pid % 25 == (uint)FixedNature && pid.GetGender(Pokemon.GenderRatio) == FixedGender)
                 {
                     // 性格・性別が一致するPIDに当たったら
                     if (TSV < 0x10000 && (lid ^ hid ^ TSV) >= 8) yield break; // TSV指定済みで色回避が発生しないなら終了.
@@ -69,16 +69,17 @@ namespace PokemonXDRNGLibrary
 
             var rep = seed;
             seed.Advance(2); // dummyPID
-            uint AbilityIndex = seed.GetRand(2);
+            // 個体値は生成されない
+            var AbilityIndex = seed.GetRand(2);
             uint PID;
             while (true)
             {
-                PID = seed.GetPID(_ => (FixedGender == Gender.Genderless || _.GetGender(pokemon.GenderRatio) == FixedGender) && (FixedNature == Nature.other || (Nature)(_ % 25) == FixedNature));
+                PID = seed.GetPID(_ => (FixedGender == Gender.Genderless || _.GetGender(Pokemon.GenderRatio) == FixedGender) && (FixedNature == Nature.other || (Nature)(_ % 25) == FixedNature));
                 break;
             }
 
             finSeed = seed;
-            return pokemon.GetIndividual(FixedPID, Lv, FixedIVs, AbilityIndex).SetRepSeed(rep);
+            return Pokemon.GetIndividual(FixedPID, Lv, FixedIVs, AbilityIndex).SetRepSeed(rep);
         }
         public override GCIndividual Generate(uint seed, out uint finSeed, uint TSV)
         {
@@ -90,13 +91,13 @@ namespace PokemonXDRNGLibrary
             uint PID;
             while (true)
             {
-                PID = seed.GetPID(_ => (FixedGender == Gender.Genderless || _.GetGender(pokemon.GenderRatio) == FixedGender) && (FixedNature == Nature.other || (Nature)(_ % 25) == FixedNature));
+                PID = seed.GetPID(_ => (FixedGender == Gender.Genderless || _.GetGender(Pokemon.GenderRatio) == FixedGender) && (FixedNature == Nature.other || (Nature)(_ % 25) == FixedNature));
 
                 if (!PID.IsShiny(TSV)) break;
             }
 
             finSeed = seed;
-            return pokemon.GetIndividual(FixedPID, Lv, FixedIVs, AbilityIndex).SetRepSeed(rep);
+            return Pokemon.GetIndividual(FixedPID, Lv, FixedIVs, AbilityIndex).SetRepSeed(rep);
         }
 
         internal override IEnumerable<CalcBackCell> CalcBack(CalcBackCell cell)
