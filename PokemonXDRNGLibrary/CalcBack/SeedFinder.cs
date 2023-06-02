@@ -11,13 +11,7 @@ namespace PokemonXDRNGLibrary
     static public class SeedFinder//(Co->XD) オプショナル引数も含めてそれらしきマジックナンバーを調整しています.
     {
         static readonly List<uint>[] LOWER;
-        private static readonly int[] minBlinkableBlank;　// randに対し, 「到達したときに瞬きをするような内部カウンタの値」の最小値.(Co->XD)瞬きからの特定処理用の変数の追加
-
-namespace PokemonXDRNGLibrary
-{
-    static public class SeedFinder
-    {
-        static readonly List<uint>[] LOWER;
+        private static readonly int[] minBlinkableBlank;// randに対し, 「到達したときに瞬きをするような内部カウンタの値」の最小値.(Co->XD)瞬きからの特定処理用の変数の追加
 
         static SeedFinder()
         {
