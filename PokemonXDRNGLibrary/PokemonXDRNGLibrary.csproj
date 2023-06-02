@@ -70,9 +70,7 @@
     </Compile>
     <Compile Include="QuickBattle\QuickBattleGenerator.cs" />
     <Compile Include="QuickBattle\QuickBattleSeedSearcher.cs" />
-    <Compile Include="RNGTarget.cs" />
     <Compile Include="SeedEnumerators.cs" />
-    <Compile Include="SeedFinder.cs" />
     <Compile Include="Util\BlinkConst.cs" />
     <Compile Include="Core\RNGTarget.cs" />
     <Compile Include="CalcBack\SeedFinder.cs" />
