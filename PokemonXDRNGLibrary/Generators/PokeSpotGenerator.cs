@@ -3,37 +3,39 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PokemonPRNG.LCG32;
 using PokemonPRNG.LCG32.GCLCG;
 using PokemonStandardLibrary;
 using PokemonStandardLibrary.Gen3;
 
 namespace PokemonXDRNGLibrary
 {
-    class PokeSpotSlot
+    class PokeSpotSlot : IGeneratable<GCIndividual, uint>
     {
-        private uint baseLv;
-        private uint LvRange;
-        internal Pokemon.Species pokemon;
+        public uint BaseLv { get; }
+        public uint VariableLv { get; }
+        public Pokemon.Species Species { get; }
 
-        public GCIndividual Generate(uint seed, uint PID)
+        public GCIndividual Generate(uint seed, uint pid)
         {
             var rep = seed;
             seed.Advance(3); // dummyTSV, and ???
-            var Lv = baseLv + seed.GetRand(LvRange);
+            var lv = BaseLv + seed.GetRand(VariableLv);
             seed.Advance(2); // dummyPID
-            uint[] IVs = seed.GetIVs();
-            uint AbilityIndex = seed.GetRand(2);
+            var ivs = seed.GetIVs();
+            var abilityIndex = seed.GetRand(2);
             
-            return pokemon.GetIndividual(PID, Lv, IVs, AbilityIndex).SetRepSeed(rep);
+            return Species.GetIndividual(pid, lv, ivs, abilityIndex).SetRepSeed(rep);
         }
 
         public PokeSpotSlot(string name, uint baseLv, uint LvRange)
         {
-            this.pokemon = Pokemon.GetPokemon(name);
-            this.baseLv = baseLv;
-            this.LvRange = LvRange;
+            this.Species = Pokemon.GetPokemon(name);
+            this.BaseLv = baseLv;
+            this.VariableLv = LvRange;
         }
     }
+
     public class PokeSpotPID
     {
         private Pokemon.Individual Individual;
@@ -53,6 +55,7 @@ namespace PokemonXDRNGLibrary
             
             return Slot.Generate(seed, PID);
         }
+
         public static readonly PokeSpotPID Munchlax = new _Munchlax();
         public static readonly PokeSpotPID Empty = new PokeSpotPID();
         public static readonly PokeSpotPID Bonsly = new _Bonsly();
@@ -85,7 +88,7 @@ namespace PokemonXDRNGLibrary
             this.PID = PID;
             Slot = slot;
             if(slot != null)
-            Individual = slot.pokemon.GetIndividual(1, new uint[6], PID);
+            Individual = slot.Species.GetIndividual(1, new uint[6], PID);
         }
     }
 

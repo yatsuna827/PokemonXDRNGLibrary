@@ -34,7 +34,7 @@ namespace PokemonXDRNGLibrary
             {
                 PreGeneratePokemons[i].Generate(seed, out seed);
             }
-            return darkPokemon.Generate(seed, out seed);
+            return darkPokemon.Generate(ref seed);
         }
         public virtual GCIndividual Generate(uint seed, uint pTSV)
         {
@@ -80,7 +80,7 @@ namespace PokemonXDRNGLibrary
         public IReadOnlyList<RNGTarget> SearchTarget(uint H, uint A, uint B, uint C, uint D, uint S, RNGTargetCriteria criteria)
         {
             var seedList = SeedFinder.FindGeneratingSeed(H, A, B, C, D, S, false).ToArray();
-            var resList = seedList.Select(_ => { var s = _; return new RNGTarget(s, darkPokemon.Generate(s, out s)); }).ToArray();
+            var resList = seedList.Select(_ => new RNGTarget(_, darkPokemon.Generate(_))).ToArray();
 
             for (int k = 0; k < seedList.Length; k++)
             {
@@ -136,8 +136,8 @@ namespace PokemonXDRNGLibrary
                 }
 
                 // TSV条件をreturnするのはまた今度にします...
-                if (genSeedList1.Count > 0) resList.Add(new RNGTarget(seed, darkPokemon.Generate(seed, out uint finSeed), genSeedList1.ToArray()));
-                if (genSeedList2.Count > 0) resList.Add(new RNGTarget(seed, darkPokemon.Generate(seed, out uint finSeed, PSV), genSeedList2.ToArray()));
+                if (genSeedList1.Count > 0) resList.Add(new RNGTarget(seed, darkPokemon.Generate(seed), genSeedList1.ToArray()));
+                if (genSeedList2.Count > 0) resList.Add(new RNGTarget(seed, darkPokemon.Generate(seed), genSeedList2.ToArray()));
             }
 
             return resList;
@@ -197,7 +197,7 @@ namespace PokemonXDRNGLibrary
 
         public override GCIndividual Generate(uint seed)
         {
-            return darkPokemon.Generate(seed, out seed);
+            return darkPokemon.Generate(seed);
         }
         public override GCIndividual Generate(uint seed, uint pTSV)
         {
