@@ -50,6 +50,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdvanceSource\BlinkObject.cs" />
+    <Compile Include="Algorithm\BinarySearch.cs" />
+    <Compile Include="Algorithm\SearchSubArray.cs" />
     <Compile Include="CalcBackCell.cs" />
     <Compile Include="Criteria.cs" />
     <Compile Include="DarkPokemon.cs" />
@@ -68,8 +71,10 @@
     <Compile Include="QuickBattle\QuickBattleGenerator.cs" />
     <Compile Include="QuickBattle\QuickBattleSeedSearcher.cs" />
     <Compile Include="RNGTarget.cs" />
+    <Compile Include="SeedEnumerators.cs" />
     <Compile Include="SeedFinder.cs" />
     <Compile Include="QuickBattle\XDDBClient.cs" />
+    <Compile Include="Util\BlinkConst.cs" />
     <Compile Include="XDRNGSystem.cs" />
     <Compile Include="XDStarter.cs" />
     <Compile Include="XDTradePokemon.cs" />
