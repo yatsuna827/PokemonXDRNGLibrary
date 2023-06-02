@@ -80,7 +80,6 @@
     <Compile Include="Core\XDRNGSystem.cs" />
     <Compile Include="Generators\XDStarter.cs" />
     <Compile Include="Generators\XDTradePokemon.cs" />
-
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
