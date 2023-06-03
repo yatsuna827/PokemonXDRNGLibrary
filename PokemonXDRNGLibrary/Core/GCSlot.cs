@@ -11,7 +11,7 @@ using PokemonStandardLibrary.Gen3;
 
 namespace PokemonXDRNGLibrary
 {
-    public class GCSlot : IGeneratable<GCIndividual, uint>, ISideEffectiveGeneratable<GCIndividual, uint>
+    public class GCSlot : IGeneratable<GCIndividual, uint>, IGeneratableEffectful<GCIndividual, uint>
     {
         public uint Lv { get; }
         public Pokemon.Species Pokemon { get; }

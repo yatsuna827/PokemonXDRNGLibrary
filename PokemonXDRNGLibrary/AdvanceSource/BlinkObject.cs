@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using PokemonPRNG.LCG32.GCLCG;
 
 namespace PokemonXDRNGLibrary.AdvanceSource
@@ -15,16 +13,13 @@ namespace PokemonXDRNGLibrary.AdvanceSource
 
         public void Initialize(int initialCounter)
         {
-            // ほんとは1で初期化なんだけど….
-            // もっと厳密にいえば0,2,5,7,9,...と進む
-            // でもカウンタが10以上になるまでは判定は発生しないので、1,3,5,7,9,10...と進んだのと特に違いはない
             blinkCounter = initialCounter; 
             remainCoolTime = 0;
         }
         public bool CountUp(ref uint seed, ref uint index)
         {
             if (remainCoolTime-- > 0) return false; // マイナスに振り切るぶんには問題ないので.
-            if ((blinkCounter += 2) < 10) return false;
+            if ((blinkCounter ++) < 10) return false;
 
             index++;
             if (seed.GetRand() >= BlinkConst.blinkThresholds[blinkCounter - 10]) return false;
@@ -34,7 +29,7 @@ namespace PokemonXDRNGLibrary.AdvanceSource
 
             return true;
         }
-        public BlinkObject(int cool = 4, int initCounter = 0)
+        public BlinkObject(int cool, int initCounter = 0)
         {
             coolTime = cool;
             Initialize(initCounter);

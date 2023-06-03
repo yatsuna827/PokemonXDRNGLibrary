@@ -31,8 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PokemonPRNG, Version=3.5.9.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\PokemonPRNG.3.5.9\lib\netstandard2.0\PokemonPRNG.dll</HintPath>
+    <Reference Include="PokemonPRNG, Version=3.6.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PokemonPRNG.3.6.2\lib\netstandard2.0\PokemonPRNG.dll</HintPath>
     </Reference>
     <Reference Include="PokemonStandardLibrary, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\PokemonStandardLibrary.1.4.0\lib\netstandard2.0\PokemonStandardLibrary.dll</HintPath>
@@ -58,7 +58,7 @@
     <Compile Include="Generators\DarkPokemon.cs" />
     <Compile Include="Core\GCIndividual.cs" />
     <Compile Include="Core\GCSlot.cs" />
-    <Compile Include="IrregularAdvanceCounter.cs" />
+    <Compile Include="AdvanceSource\IrregularAdvanceCounter.cs" />
     <Compile Include="QuickBattle\Enums.cs" />
     <Compile Include="Generators\PokeSpotGenerator.cs" />
     <Compile Include="CalcBack\PreGenerateSlot.cs" />

@@ -3,7 +3,7 @@ using PokemonPRNG.LCG32.GCLCG;
 
 namespace PokemonXDRNGLibrary.QuickBattle
 {
-    public class QuickBattleGenerator: IGeneratable<QuickBattleResult>, ISideEffectiveGeneratable<QuickBattleResult>
+    public class QuickBattleGenerator: IGeneratable<QuickBattleResult>, IGeneratableEffectful<QuickBattleResult>
     {
         private static readonly (GCSlot First, GCSlot Second)[] playerTeam = new (GCSlot, GCSlot)[]
         {

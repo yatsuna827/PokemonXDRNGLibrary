@@ -10,7 +10,7 @@ namespace PokemonXDRNGLibrary
 {
     public class XDStarter : IGeneratable<XDStarterResult>
     {
-        private static readonly ISideEffectiveGeneratable<GCIndividual> EEVEE = (new GCSlot("イーブイ", 10) as ISideEffectiveGeneratable<GCIndividual, uint>).Apply(0x10000u);
+        private static readonly IGeneratableEffectful<GCIndividual> EEVEE = (new GCSlot("イーブイ", 10) as IGeneratableEffectful<GCIndividual, uint>).Apply(0x10000u);
         public XDStarterResult Generate(uint seed)
         {
             seed.Advance(1000);
