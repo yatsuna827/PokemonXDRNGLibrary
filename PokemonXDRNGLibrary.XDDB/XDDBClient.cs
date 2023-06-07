@@ -6,8 +6,9 @@ using System.IO;
 using System.Threading.Tasks;
 using PokemonPRNG.LCG32.GCLCG;
 using PokemonPRNG.LCG32;
+using PokemonXDRNGLibrary.QuickBattle;
 
-namespace PokemonXDRNGLibrary.QuickBattle
+namespace PokemonXDRNGLibrary.XDDB
 {
     public readonly struct QuickBattleInput
     {

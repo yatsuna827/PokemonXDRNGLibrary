@@ -5,7 +5,9 @@ VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test\Test.csproj", "{5300B0EB-3870-40B3-A98B-2AD8AC11D6A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokemonXDRNGLibrary", "PokemonXDRNGLibrary\PokemonXDRNGLibrary.csproj", "{F7E7DB97-5D48-42D5-B8E1-DD2403789749}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PokemonXDRNGLibrary", "PokemonXDRNGLibrary\PokemonXDRNGLibrary.csproj", "{F7E7DB97-5D48-42D5-B8E1-DD2403789749}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokemonXDRNGLibrary.XDDB", "PokemonXDRNGLibrary.XDDB\PokemonXDRNGLibrary.XDDB.csproj", "{4A1129EB-9050-4620-BC31-6A13F0BA488C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{F7E7DB97-5D48-42D5-B8E1-DD2403789749}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7E7DB97-5D48-42D5-B8E1-DD2403789749}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7E7DB97-5D48-42D5-B8E1-DD2403789749}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A1129EB-9050-4620-BC31-6A13F0BA488C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A1129EB-9050-4620-BC31-6A13F0BA488C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A1129EB-9050-4620-BC31-6A13F0BA488C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A1129EB-9050-4620-BC31-6A13F0BA488C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

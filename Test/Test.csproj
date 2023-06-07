@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PokemonXDRNGLibrary.XDDB\PokemonXDRNGLibrary.XDDB.csproj" />
     <ProjectReference Include="..\PokemonXDRNGLibrary\PokemonXDRNGLibrary.csproj" />
   </ItemGroup>
 

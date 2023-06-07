@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PokemonXDRNGLibrary.QuickBattle
+namespace PokemonXDRNGLibrary.XDDB
 {
     public partial class QuickBattleSeedSearcher
     {
