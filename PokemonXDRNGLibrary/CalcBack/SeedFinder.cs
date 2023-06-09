@@ -110,14 +110,14 @@ namespace PokemonXDRNGLibrary
         /// <param name="allowanceLimitOfError"></param>
         /// <param name="coolTime"></param>
         /// <returns></returns>
-        public static IEnumerable<uint> FindCurrentSeedByBlinkFaster(uint seed, uint minIndex, uint maxIndex, int[] blinkInput, int allowanceLimitOfError, int coolTime)
+        public static IEnumerable<uint> FindCurrentSeedByBlinkFaster(uint seed, uint minIndex, uint maxIndex, int[] blinkInput, int coolTime, int allowanceLimitOfError, double blankMagnification)
         {
             seed.Advance(minIndex);
 
             var n = (ulong)maxIndex - minIndex + 1;
 
             var e = seed.EnumerateActionSequence(new BlinkObjectEnumeratorHanlder(new BlinkObject(coolTime, 1))).GetEnumerator();
-            var blinkCache = new (int, uint)[256]; // 瞬き間隔をキャッシュしておく配列.
+            var blinkCache = new (int Blank, uint Seed)[256]; // 瞬き間隔をキャッシュしておく配列.
 
             for (int i = 0; i < blinkInput.Length; i++)
             {
@@ -129,12 +129,15 @@ namespace PokemonXDRNGLibrary
             {
                 for (int i = 0; i < blinkInput.Length; i++)
                 {
-                    var b = blinkCache[(k + i) & 0xFF].Item1;
-                    if (blinkInput[i] + allowanceLimitOfError < b || b < blinkInput[i] - allowanceLimitOfError) return false;
+                    var b = blinkCache[(k + i) & 0xFF].Blank;
+
+                    if (blinkInput[i] + allowanceLimitOfError < b) return false;
+                    if (blinkInput[i] - allowanceLimitOfError > (b * blankMagnification)) return false;
                 }
 
                 return true;
             };
+
             int head = 0, tail = blinkInput.Length;
             do
             {
@@ -142,7 +145,7 @@ namespace PokemonXDRNGLibrary
                 if (!e.MoveNext()) yield break;
                 blinkCache[tail++ & 0xFF] = (e.Current.Interval, e.Current.Seed.GetIndex(seed));
             }
-            while (blinkCache[head & 0xFF].Item2 <= n);
+            while (blinkCache[head & 0xFF].Seed <= n);
         }
 
         /// <summary>
