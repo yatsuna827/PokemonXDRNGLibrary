@@ -174,6 +174,90 @@ namespace PokemonXDRNGLibrary
         }
     }
 
+    public class Slot
+    {
+        private readonly uint _lv;
+        private readonly Pokemon.Species _species;
+        private readonly Gender _fixedGender;
+        private readonly Nature _fixedNature;
+
+        public virtual GCIndividual Generate(uint seed, uint tsv = 0x10000)
+        {
+            seed.Advance(2); // dummyPID
+            var ivs = seed.GetIVs();
+            var abilityIndex = seed.GetRand(2);
+            var pid = seed.GetPID(tsv, _species.GenderRatio, _fixedGender, _fixedNature);
+
+            return _species.GetIndividual(pid, _lv, ivs, abilityIndex);
+        }
+
+    }
+
+    public class BasicPIDGenerator : IGeneratableEffectful<uint, uint>
+    {
+        public uint Generate(ref uint seed, uint tsv)
+        {
+            var h16 = seed.GetRand();
+            var l16 = seed.GetRand();
+            var pid = (h16 << 16) | l16;
+
+            // 高々3回しか呼ばれないので再帰にしてみた
+            if ((h16 ^ l16 ^ tsv) < 8) return Generate(ref seed, tsv);
+
+            return pid;
+        }
+    }
+    public class NatureConditionalPIDGenerator : IGeneratableEffectful<uint, uint>
+    {
+        private readonly uint _fixedNature;
+        public uint Generate(ref uint seed, uint tsv)
+        {
+            while (true)
+            {
+                var h16 = seed.GetRand();
+                var l16 = seed.GetRand();
+                var pid = (h16 << 16) | l16;
+
+                if (pid % 25 != _fixedNature) continue;
+                if ((h16 ^ l16 ^ tsv) < 8) continue;
+
+                return pid;
+            }
+        }
+
+        public NatureConditionalPIDGenerator(Nature fixedNature)
+            => _fixedNature = (uint)fixedNature;
+
+    }
+    public class ConditionalPIDGenerator : IGeneratableEffectful<uint, uint>
+    {
+        private readonly uint _genderRatio;
+        private readonly bool _fixedGenderIsFemale;
+        private readonly uint _fixedNature;
+        public uint Generate(ref uint seed, uint tsv)
+        {
+            while (true)
+            {
+                var h16 = seed.GetRand();
+                var l16 = seed.GetRand();
+                var pid = (h16 << 16) | l16;
+
+                if (pid % 25 != _fixedNature) continue;
+                if (((pid & 0xFF) < _genderRatio) != _fixedGenderIsFemale) continue;
+                if ((h16 ^ l16 ^ tsv) < 8) continue;
+
+                return pid;
+            }
+        }
+
+        public ConditionalPIDGenerator(Nature fixedNature, Pokemon.Species species, Gender fixedGender)
+        {
+            _genderRatio = (uint)species.GenderRatio;
+            _fixedGenderIsFemale = fixedGender == Gender.Female;
+            _fixedNature = (uint)fixedNature;
+        }
+    }
+
     static class GenerateModules
     {
         public static uint GetPID(ref this uint seed, Func<uint, bool> condition)
@@ -200,15 +284,15 @@ namespace PokemonXDRNGLibrary
         }
         public static uint[] GetIVs(ref this uint seed)
         {
-            uint HAB = seed.GetRand();
-            uint SCD = seed.GetRand();
+            var hab = seed.GetRand();
+            var scd = seed.GetRand();
             return new uint[6] {
-                HAB & 0x1f,
-                (HAB >> 5) & 0x1f,
-                (HAB >> 10) & 0x1f,
-                (SCD >> 5) & 0x1f,
-                (SCD >> 10) & 0x1f,
-                SCD & 0x1f
+                hab & 0x1f,
+                (hab >> 5) & 0x1f,
+                (hab >> 10) & 0x1f,
+                (scd >> 5) & 0x1f,
+                (scd >> 10) & 0x1f,
+                scd & 0x1f
             };
         }
         public static bool IsShiny(this uint PID, uint TSV) { return ((PID & 0xFFFF) ^ (PID >> 16) ^ TSV) < 8; }

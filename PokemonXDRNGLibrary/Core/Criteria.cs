@@ -57,7 +57,7 @@ namespace PokemonXDRNGLibrary
     {
         public bool[] nature;
         public string ability="";
-        public Gender gender;
+        public Gender gender = Gender.Genderless;
 
         public PokeType HiddenPowerType = PokeType.None;
         public uint MinHiddenPower = 30;

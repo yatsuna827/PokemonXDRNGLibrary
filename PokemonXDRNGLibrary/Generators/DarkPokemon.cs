@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using PokemonPRNG.LCG32;
 using PokemonPRNG.LCG32.GCLCG;
 using PokemonStandardLibrary;
 
@@ -23,11 +24,10 @@ namespace PokemonXDRNGLibrary
             lvBonus = bonus;
         }
 
+        private static readonly FirstCameraAngleGenerator _angleGenerator = new FirstCameraAngleGenerator();
         public virtual GCIndividual Generate(uint seed)
         {
-            uint r;
-            do { r = seed.GetRand(10); } while (r == 3); // トレーナーによっては他の値でもスキップ?
-            if (r == 8) seed.Advance(5); else if (r < 5) seed.Advance(); else seed.Advance(2);
+            seed.Advance(_angleGenerator);
 
             uint DummyTSV = seed.GetRand() ^ seed.GetRand();
             for (int i = 0; i < PreGeneratePokemons.Count; i++)
@@ -84,7 +84,8 @@ namespace PokemonXDRNGLibrary
 
             for (int k = 0; k < seedList.Length; k++)
             {
-                if (criteria.HiddenPowerType != PokeType.None && resList[k].targetIndividual.HiddenPowerType != criteria.HiddenPowerType) continue;
+                if (criteria.HiddenPowerType != PokeType.None && 
+                    (resList[k].targetIndividual.HiddenPowerType & criteria.HiddenPowerType) == 0) continue;
                 if (resList[k].targetIndividual.HiddenPower < criteria.MinHiddenPower) continue;
                 if (criteria.ability != "" && resList[k].targetIndividual.Ability != criteria.ability) continue;
                 if (criteria.gender != Gender.Genderless && resList[k].targetIndividual.Gender != criteria.gender) continue;
@@ -103,6 +104,7 @@ namespace PokemonXDRNGLibrary
             return resList.Where(_=>_.generatableSeeds.Length != 0).ToArray();
         }
 
+        private static readonly AngleReverser _angleReverser = new AngleReverser();
         public IReadOnlyList<RNGTarget> CalcBack(uint H, uint A, uint B, uint C, uint D, uint S, uint TSV = 0x10000)
         {
             var preList = PreGeneratePokemons.Reverse().ToArray();
@@ -129,10 +131,13 @@ namespace PokemonXDRNGLibrary
                 foreach (var cell in cells)
                 {
                     if (TSV != 0x10000 && cell.preGeneratedPSVList.Any(_ => (_ ^ TSV) < 8)) continue; // 色回避が発生してしまうのでダメ~~~~~~~~
-                    if (cell.TSV != 0x10000 && ((TSV ^ cell.TSV) >= 8) || TSV == 0x10000) continue; // TSV条件を満たさないのでダメ~~~~~~~~
-
-                    var seeds = CalcBackAngle(cell.seed);
-                    if (TSV == PSV) genSeedList2.AddRange(seeds); else genSeedList1.AddRange(seeds);
+                    if (cell.TSV != 0x10000 && (((TSV ^ cell.TSV) >= 8) || TSV == 0x10000)) continue; // TSV条件を満たさないのでダメ~~~~~~~~
+                    
+                    var seeds = _angleReverser.Reverse(cell.seed.PrevSeed(2)).ToArray();
+                    if (TSV == PSV) 
+                        genSeedList2.AddRange(seeds); 
+                    else 
+                        genSeedList1.AddRange(seeds);
                 }
 
                 // TSV条件をreturnするのはまた今度にします...
@@ -213,4 +218,5 @@ namespace PokemonXDRNGLibrary
             return darkPokemon.Generate(seed, pTSV, criteria);
         }
     }
+
 }

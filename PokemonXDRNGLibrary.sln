@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test\Test.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PokemonXDRNGLibrary", "PokemonXDRNGLibrary\PokemonXDRNGLibrary.csproj", "{F7E7DB97-5D48-42D5-B8E1-DD2403789749}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokemonXDRNGLibrary.XDDB", "PokemonXDRNGLibrary.XDDB\PokemonXDRNGLibrary.XDDB.csproj", "{4A1129EB-9050-4620-BC31-6A13F0BA488C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PokemonXDRNGLibrary.XDDB", "PokemonXDRNGLibrary.XDDB\PokemonXDRNGLibrary.XDDB.csproj", "{4A1129EB-9050-4620-BC31-6A13F0BA488C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp", "ConsoleApp\ConsoleApp.csproj", "{845F272A-D672-4EA4-9357-6CD8CFBF9AC6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{4A1129EB-9050-4620-BC31-6A13F0BA488C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A1129EB-9050-4620-BC31-6A13F0BA488C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A1129EB-9050-4620-BC31-6A13F0BA488C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{845F272A-D672-4EA4-9357-6CD8CFBF9AC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{845F272A-D672-4EA4-9357-6CD8CFBF9AC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{845F272A-D672-4EA4-9357-6CD8CFBF9AC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{845F272A-D672-4EA4-9357-6CD8CFBF9AC6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

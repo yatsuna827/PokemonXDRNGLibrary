@@ -6,32 +6,37 @@ namespace PokemonXDRNGLibrary.AdvanceSource
 {
     public class BlinkObject
     {
-        private readonly int coolTime;
-        private int remainCoolTime = 0;
-        private int blinkCounter;
-        public int Counter { get => blinkCounter; }
+        private readonly int _coolTime;
+        private readonly int _delayAtMaturity;
+        private int _remainCoolTime = 0;
+        private int _blinkCounter;
+        public int Counter { get => _blinkCounter; }
 
         public void Initialize(int initialCounter)
         {
-            blinkCounter = initialCounter; 
-            remainCoolTime = 0;
+            _blinkCounter = initialCounter; 
+            _remainCoolTime = 0;
         }
         public bool CountUp(ref uint seed, ref uint index)
         {
-            if (remainCoolTime-- > 0) return false; // マイナスに振り切るぶんには問題ないので.
-            if ((blinkCounter ++) < 10) return false;
+            if (_remainCoolTime-- > 0) return false; // マイナスに振り切るぶんには問題ないので.
+            if (_blinkCounter++ < 10) return false;
 
             index++;
-            if (seed.GetRand() >= BlinkConst.blinkThresholds[blinkCounter - 10]) return false;
+            var rand = seed.GetRand();
+            if (_blinkCounter < 180 && rand >= BlinkConst.blinkThresholds[_blinkCounter - 10]) return false;
+            // 実際は停滞によってカウンタが満期までが延びているので、その分を遅らせる
+            if (180 <= _blinkCounter && _blinkCounter < 180 + _delayAtMaturity) return false;
 
-            blinkCounter = 0;
-            remainCoolTime = coolTime;
+            _blinkCounter = 0;
+            _remainCoolTime = _coolTime;
 
             return true;
         }
-        public BlinkObject(int cool, int initCounter = 0)
+        public BlinkObject(int cool, int initCounter = 0, int delayAtMaturity = 0)
         {
-            coolTime = cool;
+            _coolTime = cool;
+            _delayAtMaturity = delayAtMaturity;
             Initialize(initCounter);
         }
     }
@@ -80,10 +85,5 @@ namespace PokemonXDRNGLibrary.AdvanceSource
 
             return seed;
         }
-
-        public static BlinkObjectEnumeratorHanlder ResultScene(BlinkObject pokemon, bool enemyBlinking, int initCounter = 0)
-            => enemyBlinking ?
-                new BlinkObjectEnumeratorHanlder((actions) => actions[2], new BlinkObject(10, initCounter), new BlinkObject(10, initCounter), pokemon) :
-                new BlinkObjectEnumeratorHanlder((actions) => actions[1], new BlinkObject(10, initCounter), pokemon);
     }
 }

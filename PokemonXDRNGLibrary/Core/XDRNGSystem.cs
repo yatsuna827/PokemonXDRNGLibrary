@@ -101,7 +101,8 @@ namespace PokemonXDRNGLibrary
             xdList.Add(new XDDarkPokemon("タマザラシ", 17, new PreGenerateSlot[]
             {
                 new PreGenerateSlot("タッツー", Gender.Male, Nature.Quirky),
-                new PreGenerateSlot("トサキント", Gender.Female, Nature.Serious)
+                new PreGenerateSlot("トサキント", Gender.Female, Nature.Serious),
+                // new PreGenerateSlot("ダンバル", Gender.Genderless, Nature.Hardy),
             }));
             xdList.Add(new XDDarkPokemon("ヤジロン", 17));
             xdList.Add(new XDDarkPokemon("メリープ", 17));
@@ -242,13 +243,13 @@ namespace PokemonXDRNGLibrary
             {
                 new PreGenerateSlot("ハブネーク", Gender.Male, Nature.Quirky),
                 new PreGenerateSlot("ヤミカラス", Gender.Female, Nature.Docile),
-                new PreGenerateSlot("パラス")
+                new PreGenerateDarkPokemon("パラス")
             }));
             xdList.Add(new XDDarkPokemon("シェルダー", 29));
             xdList.Add(new XDDarkPokemon("スピアー", 30));
             xdList.Add(new XDDarkPokemon("ピジョン", 30, new PreGenerateSlot[]
             {
-                new PreGenerateSlot("スピアー"),
+                new PreGenerateDarkPokemon("スピアー"),
                 new PreGenerateSlot("オオタチ", Gender.Male, Nature.Serious),
                 new PreGenerateSlot("トゲチック", Gender.Male, Nature.Bashful)
             }));
@@ -263,7 +264,7 @@ namespace PokemonXDRNGLibrary
                 new PreGenerateSlot("キュウコン", Gender.Female, Nature.Serious),
                 new PreGenerateSlot("ワタッコ", Gender.Male, Nature.Docile),
                 new PreGenerateSlot("マリルリ", Gender.Female, Nature.Hardy),
-                new PreGenerateSlot("モンジャラ")
+                new PreGenerateDarkPokemon("モンジャラ")
             }));
             xdList.Add(new XDDarkPokemon("レアコイル", 30, new PreGenerateSlot[]
             {
@@ -282,7 +283,7 @@ namespace PokemonXDRNGLibrary
                 new PreGenerateSlot("ゴルダック", Gender.Female, Nature.Bashful),
                 new PreGenerateSlot("カポエラー", Gender.Male, Nature.Quirky),
                 new PreGenerateSlot("ハリテヤマ", Gender.Male, Nature.Serious),
-                new PreGenerateSlot("モルフォン")
+                new PreGenerateDarkPokemon("モルフォン")
             }));
             xdList.Add(new XDDarkPokemon("アーボック", 33, new PreGenerateSlot[]
             {
@@ -304,7 +305,7 @@ namespace PokemonXDRNGLibrary
                 new PreGenerateSlot("トドグラー", Gender.Female, Nature.Serious),
                 new PreGenerateSlot("ヤドキング", Gender.Female, Nature.Docile),
                 new PreGenerateSlot("リングマ", Gender.Male, Nature.Quirky),
-                new PreGenerateSlot("オコリザル")
+                new PreGenerateDarkPokemon("オコリザル")
             }));
             xdList.Add(new XDDarkPokemon("ゴルダック", 34, new PreGenerateSlot[]
             {
@@ -317,7 +318,7 @@ namespace PokemonXDRNGLibrary
                 new PreGenerateSlot("シザリガー", Gender.Male, Nature.Quirky),
                 new PreGenerateSlot("ペリッパー", Gender.Female, Nature.Docile),
                 new PreGenerateSlot("マンタイン", Gender.Female, Nature.Bashful),
-                new PreGenerateSlot("ゴルダック")
+                new PreGenerateDarkPokemon("ゴルダック")
             }));
             xdList.Add(new XDDarkPokemon("ドードリオ", 34, new PreGenerateSlot[]
             {
@@ -326,7 +327,7 @@ namespace PokemonXDRNGLibrary
             xdList.Add(new XDDarkPokemon("ラッタ", 34, new PreGenerateSlot[]
             {
                 new PreGenerateSlot("ネイティオ", Gender.Female, Nature.Bashful),
-                new PreGenerateSlot("ドードリオ"),
+                new PreGenerateDarkPokemon("ドードリオ"),
                 new PreGenerateSlot("ナマズン", Gender.Male, Nature.Bashful)
             }));
             xdList.Add(new XDDarkPokemon("カモネギ", 36, new PreGenerateSlot[]
@@ -340,7 +341,7 @@ namespace PokemonXDRNGLibrary
                 new PreGenerateSlot("サーナイト", Gender.Male, Nature.Serious),
                 new PreGenerateSlot("サクラビス", Gender.Female, Nature.Hardy),
                 new PreGenerateSlot("ロゼリア", Gender.Male, Nature.Quirky),
-                new PreGenerateSlot("カモネギ")
+                new PreGenerateDarkPokemon("カモネギ")
             }));
             xdList.Add(new XDDarkPokemon("ガルーラ", 35, new PreGenerateSlot[]
             {
@@ -353,7 +354,7 @@ namespace PokemonXDRNGLibrary
                 new PreGenerateSlot("マルマイン", Gender.Genderless, Nature.Hardy),
                 new PreGenerateSlot("ムウマ", Gender.Female, Nature.Bashful),
                 new PreGenerateSlot("ネンドール", Gender.Genderless, Nature.Serious),
-                new PreGenerateSlot("ガルーラ")
+                new PreGenerateDarkPokemon("ガルーラ")
             }));
             xdList.Add(new XDDarkPokemon("ブーバー", 36, new PreGenerateSlot[]
             {
@@ -366,7 +367,7 @@ namespace PokemonXDRNGLibrary
                 new PreGenerateSlot("ヘルガー", Gender.Male, Nature.Bashful),
                 new PreGenerateSlot("キュウコン", Gender.Male, Nature.Bashful),
                 new PreGenerateSlot("ラフレシア", Gender.Female, Nature.Hardy),
-                new PreGenerateSlot("ブーバー")
+                new PreGenerateDarkPokemon("ブーバー")
             }));
             xdList.Add(new XDDarkPokemon("ギャロップ", 40, new PreGenerateSlot[]
             {
@@ -379,7 +380,7 @@ namespace PokemonXDRNGLibrary
                 new PreGenerateSlot("バクーダ", Gender.Male, Nature.Quirky),
                 new PreGenerateSlot("マタドガス", Gender.Male, Nature.Docile),
                 new PreGenerateSlot("ベトベトン", Gender.Female, Nature.Serious),
-                new PreGenerateSlot("ギャロップ")
+                new PreGenerateDarkPokemon("ギャロップ")
             }));
             xdList.Add(new XDDarkPokemon("エビワラー", 38, new PreGenerateSlot[]
             {
@@ -408,7 +409,7 @@ namespace PokemonXDRNGLibrary
             {
                 new PreGenerateSlot("オドシシ", Gender.Female, Nature.Docile),
                 new PreGenerateSlot("バクオング", Gender.Male, Nature.Quirky),
-                new PreGenerateSlot("ストライク")
+                new PreGenerateDarkPokemon("ストライク")
             }));
             xdList.Add(new XDDarkPokemon("ソルロック", 41, new PreGenerateSlot[]
             {
@@ -421,13 +422,13 @@ namespace PokemonXDRNGLibrary
                 new PreGenerateSlot("メタング", Gender.Genderless, Nature.Quirky),
                 new PreGenerateSlot("ヌオー", Gender.Male, Nature.Docile),
                 new PreGenerateSlot("ハッサム", Gender.Female, Nature.Hardy),
-                new PreGenerateSlot("ソルロック"),
+                new PreGenerateDarkPokemon("ソルロック"),
                 new PreGenerateSlot("ポワルン", Gender.Male, Nature.Bashful),
             }));
             xdList.Add(new XDDarkPokemon("オオスバメ", 43));
             xdList.Add(new XDDarkPokemon("エレブー", 43, new PreGenerateSlot[]
             {
-                new PreGenerateSlot("オオスバメ"),
+                new PreGenerateDarkPokemon("オオスバメ"),
                 new PreGenerateSlot("フーディン", Gender.Male, Nature.Quirky),
                 new PreGenerateSlot("キングドラ", Gender.Female, Nature.Docile),
                 new PreGenerateSlot("ヘラクロス", Gender.Female, Nature.Bashful),
@@ -438,7 +439,7 @@ namespace PokemonXDRNGLibrary
                 new PreGenerateSlot("フーディン", Gender.Male, Nature.Quirky),
                 new PreGenerateSlot("キングドラ", Gender.Female, Nature.Docile),
                 new PreGenerateSlot("ヘラクロス", Gender.Female, Nature.Bashful),
-                new PreGenerateSlot("エレブー")
+                new PreGenerateDarkPokemon("エレブー")
             }));
             xdList.Add(new XDDarkPokemon("ニョロボン", 42, new PreGenerateSlot[]
             {
@@ -453,7 +454,7 @@ namespace PokemonXDRNGLibrary
                 new PreGenerateSlot("リングマ", Gender.Male, Nature.Bashful),
                 new PreGenerateSlot("ボスゴドラ", Gender.Male, Nature.Quirky),
                 new PreGenerateSlot("トドゼルガ", Gender.Female, Nature.Docile),
-                new PreGenerateSlot("ニョロボン")
+                new PreGenerateDarkPokemon("ニョロボン")
             }));
             xdList.Add(new XDDarkPokemon("ダグトリオ", 40, new PreGenerateSlot[]
             {
@@ -469,54 +470,54 @@ namespace PokemonXDRNGLibrary
             xdList.Add(new XDDarkPokemon("ボーマンダ", 50, new PreGenerateSlot[]
             {
                 new PreGenerateSlot("テッカニン", Gender.Female, Nature.Docile),
-                new PreGenerateSlot("ライボルト"),
+                new PreGenerateDarkPokemon("ライボルト"),
             }));
             xdList.Add(new XDDarkPokemon("ガラガラ", 44, new PreGenerateSlot[]
             {
                 new PreGenerateSlot("テッカニン", Gender.Female, Nature.Docile),
-                new PreGenerateSlot("ライボルト"),
-                new PreGenerateSlot("ボーマンダ"),
+                new PreGenerateDarkPokemon("ライボルト"),
+                new PreGenerateDarkPokemon("ボーマンダ"),
                 new PreGenerateSlot("フライゴン", Gender.Male, Nature.Quirky),
             }));
             xdList.Add(new XDDarkPokemon("ラプラス", 44, new PreGenerateSlot[]
             {
                 new PreGenerateSlot("テッカニン", Gender.Female, Nature.Docile),
-                new PreGenerateSlot("ライボルト"),
-                new PreGenerateSlot("ボーマンダ"),
+                new PreGenerateDarkPokemon("ライボルト"),
+                new PreGenerateDarkPokemon("ボーマンダ"),
                 new PreGenerateSlot("フライゴン", Gender.Male, Nature.Quirky),
-                new PreGenerateSlot("ガラガラ"),
+                new PreGenerateDarkPokemon("ガラガラ"),
             }));
             xdList.Add(new XDDarkPokemon("ルギア", 50));
             xdList.Add(new XDDarkPokemon("サイドン", 46));
             xdList.Add(new XDDarkPokemon("ファイヤー", 50, new PreGenerateSlot[]
             {
-                new PreGenerateSlot("サイドン"),
+                new PreGenerateDarkPokemon("サイドン"),
             }));
             xdList.Add(new XDDarkPokemon("ナッシー", 46, new PreGenerateSlot[]
             {
-                new PreGenerateSlot("サイドン"),
-                new PreGenerateSlot("ファイヤー"),
+                new PreGenerateDarkPokemon("サイドン"),
+                new PreGenerateDarkPokemon("ファイヤー"),
             }));
             xdList.Add(new XDDarkPokemon("ケンタロス", 46, new PreGenerateSlot[]
             {
-                new PreGenerateSlot("サイドン"),
-                new PreGenerateSlot("ファイヤー"),
-                new PreGenerateSlot("ナッシー"),
+                new PreGenerateDarkPokemon("サイドン"),
+                new PreGenerateDarkPokemon("ファイヤー"),
+                new PreGenerateDarkPokemon("ナッシー"),
             }));
             xdList.Add(new XDDarkPokemon("フリーザー", 50, new PreGenerateSlot[]
             {
-                new PreGenerateSlot("サイドン"),
-                new PreGenerateSlot("ファイヤー"),
-                new PreGenerateSlot("ナッシー"),
-                new PreGenerateSlot("ケンタロス"),
+                new PreGenerateDarkPokemon("サイドン"),
+                new PreGenerateDarkPokemon("ファイヤー"),
+                new PreGenerateDarkPokemon("ナッシー"),
+                new PreGenerateDarkPokemon("ケンタロス"),
             }));
             xdList.Add(new XDDarkPokemon("サンダー", 50, new PreGenerateSlot[]
             {
-                new PreGenerateSlot("サイドン"),
-                new PreGenerateSlot("ファイヤー"),
-                new PreGenerateSlot("ナッシー"),
-                new PreGenerateSlot("ケンタロス"),
-                new PreGenerateSlot("フリーザー"),
+                new PreGenerateDarkPokemon("サイドン"),
+                new PreGenerateDarkPokemon("ファイヤー"),
+                new PreGenerateDarkPokemon("ナッシー"),
+                new PreGenerateDarkPokemon("ケンタロス"),
+                new PreGenerateDarkPokemon("フリーザー"),
             }));
             xdList.Add(new XDDarkPokemon("カイリュー", 55, new PreGenerateSlot[] 
             {

@@ -34,6 +34,8 @@ namespace PokemonXDRNGLibrary
             => new GCIndividual(species, PID, IVs, Lv, ability);
         public static GCIndividual GetIndividual(this Pokemon.Species species, uint PID, uint Lv, uint[] IVs, uint[] EVs, uint ability)
             => new GCIndividual(species, PID, IVs, EVs, Lv, ability);
-    }
 
+        public static GCIndividual ChangeLv(this Pokemon.Individual individual, uint lv)
+            => new GCIndividual(individual.Species, individual.PID, individual.IVs.ToArray(), lv, (uint)individual.Species.Ability.ToList().IndexOf(individual.Ability));
+    }
 }

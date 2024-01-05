@@ -56,7 +56,7 @@ namespace PokemonXDRNGLibrary
         }
     }
 
-    class PreGenerateDarkPokemon : PreGenerateSlot
+    public class PreGenerateDarkPokemon : PreGenerateSlot
     {
         public bool isFixed;
         public uint[] FixedIVs = new uint[6];
@@ -120,7 +120,7 @@ namespace PokemonXDRNGLibrary
             // 逆算
             while (true)
             {
-                yield return new CalcBackCell(seed.PrevSeed(6), TSV, psvList);
+                yield return new CalcBackCell(seed.PrevSeed(isFixed ? 4u : 6u), TSV, psvList);
                 // 条件を満たすPIDに当たるまで, seedを返し続ける.
                 var lid = seed.Back() >> 16;
                 var hid = seed.Back() >> 16;

@@ -45,4 +45,88 @@ namespace Test
             Assert.Equal(res.OrderBy(_ => _), new uint[] { 0x1257DEF0 }.OrderBy(_ => _));
         }
     }
+
+    public class GenerationTest
+    {
+        private static readonly XDDarkPokemon _zapdos, _articuno, _dragonite, _ralts;
+        static GenerationTest()
+        {
+            _zapdos = XDRNGSystem.GetDarkPokemon("サンダー");
+            foreach (var pre in _zapdos.PreGeneratePokemons.OfType<PreGenerateDarkPokemon>())
+                pre.isFixed = true;
+
+            _articuno = XDRNGSystem.GetDarkPokemon("フリーザー");
+            _dragonite = XDRNGSystem.GetDarkPokemon("カイリュー");
+            _ralts = XDRNGSystem.GetDarkPokemon("ラルトス");
+        }
+
+        [Theory, 
+            InlineData(0x604DB56Eu),
+            InlineData(0xD4E241C7u),
+            InlineData(0x37E1798Au)]
+        public void TestGenerateFixedZapdos(uint seed)
+        {
+            var result = _zapdos.Generate(seed);
+            Assert.Equal(0x3F3C705Eu, result.PID);
+            Assert.Equal(new uint[] { 30, 31, 31, 30, 31, 31 }, result.IVs);
+        }
+
+        [Theory, 
+            InlineData(0xE06758FDu),
+            InlineData(0xF9B0EF42u),
+            InlineData(0x68031769u)]
+        public void TestGenerateArticuno(uint seed)
+        {
+            var result = _articuno.Generate(seed);
+            Assert.Equal(0xC351DEF2u, result.PID);
+            Assert.Equal(new uint[] { 31, 31, 31, 31, 31, 31 }, result.IVs);
+        }
+
+        [Theory,
+            InlineData(0x00F402D5u),
+            InlineData(0xBBCAB518u),
+            InlineData(0x6F0240B9u)]
+        public void TestGenerateDragonite(uint seed)
+        {
+            var result = _dragonite.Generate(seed);
+            Assert.Equal(0xB1961329u, result.PID);
+            Assert.Equal(new uint[] { 31, 31, 31, 4, 31, 31 }, result.IVs);
+        }
+
+        [Theory,
+            InlineData(0x0671D11Du)]
+        public void TestGenerateShinyBlockedRalts(uint seed)
+        {
+            var notBlocked = _ralts.Generate(seed);
+            Assert.Equal(0x9D8707EBu, notBlocked.PID);
+            Assert.Equal(new uint[] { 31, 0, 31, 31, 31, 31 }, notBlocked.IVs);
+
+            var blocked = _ralts.Generate(seed, 39528);
+            Assert.Equal(0xED1D5D5Bu, blocked.PID);
+            Assert.Equal(new uint[] { 31, 0, 31, 31, 31, 31 }, blocked.IVs);
+        }
+
+    }
+
+    public class ReverseTest
+    {
+        [Fact]
+        public void TestReverseDragonite()
+        {
+            var dragonite = XDRNGSystem.GetDarkPokemon("カイリュー");
+            var results = dragonite.CalcBack(31, 31, 31, 4, 31, 31);
+
+            Assert.Equal(1, results.Count);
+
+            var result = results[0];
+            Assert.Equal(0xB1961329u, result.targetIndividual.PID);
+            Assert.Equal(new uint[] { 31, 31, 31, 4, 31, 31 }, result.targetIndividual.IVs);
+            Assert.Equal(280, result.generatableSeeds.Length);
+            Assert.All(result.generatableSeeds, (_) =>
+            {
+                Assert.Equal(0xB1961329u, dragonite.Generate(_).PID);
+            });
+        }
+    }
+
 }
