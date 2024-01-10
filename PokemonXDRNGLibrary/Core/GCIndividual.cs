@@ -9,33 +9,28 @@ namespace PokemonXDRNGLibrary
 {
     public class GCIndividual : Pokemon.Individual
     {
-        public new static readonly GCIndividual Empty = Pokemon.GetPokemon("Dummy").GetIndividual(0, 1, new uint[6], 0);
         public string GCAbility { get; }
-        public uint RepresentativeSeed { get; private set; }
-        public bool ShinySkipped { get; private set; }
+        public bool ShinySkipped { get; }
 
-        public uint[] EnemyStats { get; internal set; }
-        public GCIndividual SetRepSeed(uint seed) { RepresentativeSeed = seed; return this; }
-        public GCIndividual SetShinySkipped(bool skipped) { ShinySkipped = skipped; return this; }
+        // public uint[] EnemyStats { get; }
 
-        internal GCIndividual(Pokemon.Species species, uint pid, uint[] ivs, uint lv, uint xdability) : base(species, pid, ivs, lv)
+        internal GCIndividual(Pokemon.Species species, uint pid, uint[] ivs, uint lv, uint gcAbility, bool shinySkipped) : base(species, pid, ivs, lv)
         {
-            this.GCAbility = species.Ability[(int)xdability];
+            this.GCAbility = species.Ability[(int)gcAbility];
+            this.ShinySkipped = shinySkipped;
         }
-        internal GCIndividual(Pokemon.Species species, uint pid, uint[] ivs, uint[] evs, uint lv, uint xdability) : base(species, pid, ivs, lv)
+        internal GCIndividual(Pokemon.Species species, uint pid, uint[] ivs, uint[] evs, uint lv, uint gcAbility, bool shinySkipped) : base(species, pid, ivs, lv)
         {
-            this.GCAbility = species.Ability[(int)xdability];
+            this.GCAbility = species.Ability[(int)gcAbility];
+            this.ShinySkipped = shinySkipped;
             // EnemyStatsの計算を入れる.
         }
     }
     public static class GCExtension
     {
-        public static GCIndividual GetIndividual(this Pokemon.Species species, uint PID, uint Lv, uint[] IVs, uint ability) 
-            => new GCIndividual(species, PID, IVs, Lv, ability);
-        public static GCIndividual GetIndividual(this Pokemon.Species species, uint PID, uint Lv, uint[] IVs, uint[] EVs, uint ability)
-            => new GCIndividual(species, PID, IVs, EVs, Lv, ability);
-
-        public static GCIndividual ChangeLv(this Pokemon.Individual individual, uint lv)
-            => new GCIndividual(individual.Species, individual.PID, individual.IVs.ToArray(), lv, (uint)individual.Species.Ability.ToList().IndexOf(individual.Ability));
+        public static GCIndividual GetIndividual(this Pokemon.Species species, uint pid, uint lv, uint[] ivs, uint ability, bool shinySkipped) 
+            => new GCIndividual(species, pid, ivs, lv, ability, shinySkipped);
+        public static GCIndividual GetIndividual(this Pokemon.Species species, uint pid, uint lv, uint[] ivs, uint[] evs, uint ability, bool shinySkipped)
+            => new GCIndividual(species, pid, ivs, evs, lv, ability, shinySkipped);
     }
 }

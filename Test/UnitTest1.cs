@@ -1,4 +1,6 @@
 
+using FsCheck;
+
 namespace Test
 {
     public class UnitTest1
@@ -111,21 +113,107 @@ namespace Test
     public class ReverseTest
     {
         [Fact]
-        public void TestReverseDragonite()
+        public void TestReverseDragoniteWithoutShinySkip()
         {
             var dragonite = XDRNGSystem.GetDarkPokemon("カイリュー");
-            var results = dragonite.CalcBack(31, 31, 31, 4, 31, 31);
 
-            Assert.Equal(1, results.Count);
+            var tsv = 0u;
+            var results = dragonite.CalcBack(31, 31, 31, 4, 31, 31, tsv).ToArray();
+
+            Assert.Single(results);
 
             var result = results[0];
-            Assert.Equal(0xB1961329u, result.targetIndividual.PID);
+            var expectedPID = 0xB1961329u;
+            Assert.Equal(expectedPID, result.targetIndividual.PID);
             Assert.Equal(new uint[] { 31, 31, 31, 4, 31, 31 }, result.targetIndividual.IVs);
             Assert.Equal(280, result.generatableSeeds.Length);
             Assert.All(result.generatableSeeds, (_) =>
             {
-                Assert.Equal(0xB1961329u, dragonite.Generate(_).PID);
+                Assert.Equal(expectedPID, dragonite.Generate(_).PID);
             });
+        }
+
+        [Fact]
+        public void TestReverseDragoniteWithShinySkip()
+        {
+            var dragonite = XDRNGSystem.GetDarkPokemon("カイリュー");
+
+            var tsv = 41656u;
+            var results = dragonite.CalcBack(31, 31, 31, 4, 31, 31, tsv).ToArray();
+
+            Assert.Single(results);
+
+            var result = results[0];
+            var expectedPID = 0x4EEEDFD5u;
+
+            Assert.Equal(expectedPID, result.targetIndividual.PID);
+            Assert.Equal(new uint[] { 31, 31, 31, 4, 31, 31 }, result.targetIndividual.IVs);
+            Assert.Equal(280, result.generatableSeeds.Length);
+            Assert.All(result.generatableSeeds, (_) =>
+            {
+                Assert.Equal(expectedPID, dragonite.Generate(_, tsv).PID);
+            });
+        }
+
+        [Fact]
+        public void TestReverseDragonite()
+        {
+            var dragonite = XDRNGSystem.GetDarkPokemon("カイリュー");
+
+            var results = dragonite.CalcBack(31, 31, 31, 4, 31, 31).ToArray();
+
+            Assert.Equal(2, results.Length);
+
+            Assert.All(results, (result) =>
+            {
+                var expectedPID = result.ConditionedTSV == null ? 0xB1961329u : 0x4EEEDFD5u;
+                Assert.Equal(expectedPID, result.targetIndividual.PID);
+                Assert.Equal(new uint[] { 31, 31, 31, 4, 31, 31 }, result.targetIndividual.IVs);
+                Assert.Equal(280, result.generatableSeeds.Length);
+                Assert.All(result.generatableSeeds, (_) =>
+                {
+                    var pid = result.ConditionedTSV != null ? dragonite.Generate(_, result.ConditionedTSV.Value).PID : dragonite.Generate(_).PID;
+                    Assert.Equal(expectedPID, pid);
+                });
+            });
+        }
+
+        [Fact]
+        public void TestReverseDragonitePreGenerateShinySkip()
+        {
+            var dragonite = XDRNGSystem.GetDarkPokemon("カイリュー");
+
+            var results = dragonite.CalcBack(9, 31, 31, 31, 31, 31).OrderBy(_ => _.targetIndividual.PID).ToArray();
+
+            Assert.Equal(2, results.Length);
+
+            {
+                var result = results[0];
+                var expectedPID = 0x00296B0Du;
+                Assert.Equal(new uint[] { 9, 31, 31, 31, 31, 31 }, result.targetIndividual.IVs);
+                Assert.Equal(expectedPID, result.targetIndividual.PID);
+                Assert.NotNull(result.ConditionedTSV);
+                var tsv = result.ConditionedTSV!.Value;
+                Assert.Equal(299, result.generatableSeeds.Length);
+                Assert.All(result.generatableSeeds, (_) =>
+                {
+                    Assert.Equal(expectedPID, dragonite.Generate(_, tsv).PID);
+                });
+            }
+
+            {
+                var result = results[1];
+                var expectedPID = 0x5B07C9BFu;
+                Assert.Equal(new uint[] { 9, 31, 31, 31, 31, 31 }, result.targetIndividual.IVs);
+                Assert.Equal(expectedPID, result.targetIndividual.PID);
+                Assert.NotNull(result.ConditionedTSV);
+                var tsv = result.ConditionedTSV!.Value;
+                Assert.Equal(402, result.generatableSeeds.Length);
+                Assert.All(result.generatableSeeds, (_) =>
+                {
+                    Assert.Equal(expectedPID, dragonite.Generate(_, tsv).PID);
+                });
+            }
         }
     }
 

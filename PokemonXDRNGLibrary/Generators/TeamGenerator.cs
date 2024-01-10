@@ -16,7 +16,7 @@ namespace PokemonXDRNGLibrary
 
         public GCIndividual[] Generate(uint seed)
         {
-            seed.Used(_angle);
+            seed.Advance(_angle);
 
             var dummyTSV = seed.GetRand() ^ seed.GetRand();
             return _team.Select(_ => _.Generate(ref seed)).ToArray();

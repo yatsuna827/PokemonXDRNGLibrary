@@ -1,29 +1,112 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using PokemonPRNG.LCG32.GCLCG;
 
 namespace PokemonXDRNGLibrary
 {
     class CalcBackCell
     {
-        public readonly uint seed;
-        public readonly uint TSV;
-        public readonly List<uint> preGeneratedPSVList;
+        public uint Seed { get; }
+        public uint ConditionedTSV { get; }
 
-        public (uint seed, uint TSV, bool flag) GetGeneratableSeed()
-        {
-            var seed = this.seed;
-            var tsv = (seed >> 16) ^ (seed.Back() >> 16);
-
-            if (TSV != 0x10000 && (TSV ^ tsv) >= 8) return (seed.PrevSeed(), tsv, false); // TSV条件があり, それを満たさない
-            if (preGeneratedPSVList.Any(_ => (_ ^ tsv) < 8)) return (seed.PrevSeed(), tsv, false); // 色回避を発生させてしまう.
-
-            return (seed.PrevSeed(), tsv, true);
+        public CalcBackCell(uint seed) 
+        { 
+            Seed = seed; 
+            ConditionedTSV = 0x10000;
         }
-        public CalcBackCell(uint seed, uint tsv = 0x10000) { this.seed = seed; TSV = tsv; preGeneratedPSVList = new List<uint>(); }
-        public CalcBackCell(uint seed, uint tsv, List<uint> pidList) { this.seed = seed; TSV = tsv; preGeneratedPSVList = pidList; }
+        public CalcBackCell(uint seed, uint tsv)
+        {
+            Seed = seed;
+            ConditionedTSV = tsv;
+        }
+
+    }
+
+    class PregenerateNode
+    {
+        private readonly PregenerateNode _parent;
+        private readonly List<PregenerateNode> _children = new List<PregenerateNode>();
+
+        private bool _hasPath;
+
+        public uint GeneratedPSV { get; }
+
+        public PregenerateNode CreateChild(uint seed)
+        {
+            var child = new PregenerateNode(seed, this);
+            _children.Add(child);
+
+            return child;
+        }
+        public void Feedback()
+        {
+            _hasPath = true;
+            _parent?.Feedback();
+        }
+
+        public void Print()
+        {
+            Console.WriteLine("DarkPokemon");
+            foreach (var c in _children)
+            {
+                c.Print(" ");
+            }
+        }
+        private void Print(string tab)
+        {
+            var mark = _hasPath ? "☆" : "";
+            Console.WriteLine($"{tab}{GeneratedPSV}{mark}");
+
+            foreach (var c in _children)
+            {
+                c.Print(tab + " ");
+            }
+        }
+
+        public List<uint> GetContraindicatedTSVs(int depth)
+        {
+            var result = new List<uint>();
+
+            var tower = new List<PregenerateNode>[depth];
+            for (int i = 0; i < depth; i++)
+                tower[i] = new List<PregenerateNode>();
+
+            var queue = new Queue<(int Depth, PregenerateNode Node)>();
+            foreach (var c in _children)
+                queue.Enqueue((0, c));
+
+            while (queue.Count > 0)
+            {
+                var (d, node) = queue.Dequeue();
+                tower[d].Add(node);
+
+                foreach (var c in node._children)
+                    queue.Enqueue((d + 1, c));
+            }
+
+            foreach (var floor in tower)
+                if (floor.Count(_ => _._hasPath) == 1 && floor[0]._hasPath)
+                    result.Add(floor[0].GeneratedPSV);
+
+            return result;
+        }
+
+        public bool CheckTSV(uint tsv)
+        {
+            if ((tsv ^ GeneratedPSV) < 8) return false;
+
+            if (_parent != null) return _parent.CheckTSV(tsv);
+
+            return true;
+        }
+
+        public PregenerateNode() { }
+        public PregenerateNode(uint seed, PregenerateNode parent)
+        {
+            _parent = parent;
+ 
+            GeneratedPSV = ((seed >> 19) ^ (seed.Back() >> 19)) << 3;
+        }
     }
 }

@@ -1,288 +1,169 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using PokemonPRNG.LCG32;
+﻿using PokemonPRNG.LCG32;
 using PokemonPRNG.LCG32.GCLCG;
 using PokemonStandardLibrary;
 using PokemonStandardLibrary.Gen3;
+using PokemonStandardLibrary.CommonExtension;
+using System;
 
 namespace PokemonXDRNGLibrary
 {
-    public class GCSlot : IGeneratable<GCIndividual, uint>, IGeneratableEffectful<GCIndividual, uint>
+    public class GCSlot : IGeneratable<GCIndividual, uint>, IGeneratableEffectful<GCIndividual, uint>, ILcgConsumer, ILcgConsumer<uint>
     {
         public uint Lv { get; }
-        public Pokemon.Species Pokemon { get; }
+        public Pokemon.Species Species { get; }
         public Gender FixedGender { get; }
         public Nature FixedNature { get; }
 
+        private protected readonly IPIDGenerator _pidGenerator;
+
         public virtual GCIndividual Generate(uint seed, uint tsv = 0x10000)
         {
-            var rep = seed;
             seed.Advance(2); // dummyPID
-            var ivs = seed.GetIVs();
+            var ivs = seed.GenerateIVs();
             var abilityIndex = seed.GetRand(2);
-            var pid = seed.GetPID(tsv, Pokemon.GenderRatio, FixedGender, FixedNature);
+            var pid = seed.Generate(_pidGenerator, tsv);
 
-            return Pokemon.GetIndividual(pid, Lv, ivs, abilityIndex).SetRepSeed(rep);
+            return Species.GetIndividual(pid, Lv, ivs, abilityIndex, false);
         }
         public virtual GCIndividual Generate(ref uint seed, uint tsv = 0x10000)
         {
-            var rep = seed;
             seed.Advance(2); // dummyPID
-            var ivs = seed.GetIVs();
+            var ivs = seed.GenerateIVs();
             var abilityIndex = seed.GetRand(2);
-            var pid = seed.GetPID(tsv, Pokemon.GenderRatio, FixedGender, FixedNature);
+            var pid = seed.Generate(_pidGenerator, tsv);
 
-            return Pokemon.GetIndividual(pid, Lv, ivs, abilityIndex).SetRepSeed(rep);
+            return Species.GetIndividual(pid, Lv, ivs, abilityIndex, false);
         }
 
-        public virtual GCIndividual Generate(uint seed, out uint finSeed)
+        public virtual void Use(ref uint seed)
         {
-            var rep = seed;
-            seed.Advance(2); // dummyPID
-            var ivs = seed.GetIVs();
-            var abilityIndex = seed.GetRand(2);
+            seed.Advance(5); // dummyPID, IVs, ability
 
-            uint pid;
-            while (true)
-            {
-                pid = (seed.GetRand() << 16) | seed.GetRand();
-                if (FixedGender != Gender.Genderless && pid.GetGender(Pokemon.GenderRatio) != FixedGender)
-                    continue;
-                if (FixedNature != Nature.other && (Nature)(pid % 25) != FixedNature)
-                    continue;
-                break;
-            }
-
-            finSeed = seed;
-            return Pokemon.GetIndividual(pid, Lv, ivs, abilityIndex).SetRepSeed(rep);
+            _pidGenerator.Generate(ref seed);
         }
-        public virtual GCIndividual Generate(uint seed, out uint finSeed, uint TSV)
+        public virtual uint ComputeConsumption(uint seed)
         {
-            var rep = seed;
-            seed.Advance(2); // dummyPID
-            uint[] IVs = seed.GetIVs();
-            uint AbilityIndex = seed.GetRand(2);
-            uint PID;
-            bool shinySkip = false;
-            while (true)
-            {
-                PID = seed.GetPID(_ => (FixedGender == Gender.Genderless || _.GetGender(Pokemon.GenderRatio) == FixedGender) && (FixedNature == Nature.other || (Nature)(_ % 25) == FixedNature));
+            seed.Advance(5); // dummyPID, IVs, ability
 
-                shinySkip |= PID.IsShiny(TSV);
-                if (!PID.IsShiny(TSV)) break;
-            }
+            var pid = _pidGenerator.Generate(ref seed);
+            Console.WriteLine($"{pid:X8}");
 
-            finSeed = seed;
-            return Pokemon.GetIndividual(PID, Lv, IVs, AbilityIndex).SetRepSeed(rep).SetShinySkipped(shinySkip);
+            return seed;
         }
+
+        public virtual void Use(ref uint seed, uint tsv)
+        {
+            seed.Advance(5); // dummyPID, IVs, ability
+
+            _pidGenerator.Generate(ref seed, tsv);
+        }
+        public virtual uint ComputeConsumption(uint seed, uint tsv)
+        {
+            seed.Advance(5); // dummyPID, IVs, ability
+
+            _pidGenerator.Generate(ref seed, tsv);
+
+            return seed;
+        }
+
         public GCIndividual Generate(uint seed, Criteria criteria)
         {
-            var rep = seed;
             seed.Advance(2); // dummyPID
-            uint[] IVs = seed.GetIVs();
-            if (!criteria.CheckIVs(IVs)) return GCIndividual.Empty;
+            var ivs = seed.GenerateIVs();
+            if (!criteria.CheckIVs(ivs)) return null;
+
             uint AbilityIndex = seed.GetRand(2);
-            if (!criteria.CheckAbility(Pokemon.Ability[(int)AbilityIndex])) return GCIndividual.Empty;
-            uint PID;
-            while (true)
-            {
-                PID = seed.GetPID(_ => (FixedGender == Gender.Genderless || _.GetGender(Pokemon.GenderRatio) == FixedGender) && (FixedNature == Nature.other || (Nature)(_ % 25) == FixedNature));
+            if (!criteria.CheckAbility(Species.Ability[(int)AbilityIndex])) return null;
 
-                break;
-            }
-            var indiv = Pokemon.GetIndividual(PID, Lv, IVs, AbilityIndex);
-            if (!criteria.CheckGender(indiv.Gender)) return GCIndividual.Empty;
-            if (!criteria.CheckNature(indiv.Nature)) return GCIndividual.Empty;
-            if (!criteria.CheckShiny(indiv.PID.IsShiny(criteria.TSV))) return GCIndividual.Empty;
-            if (!criteria.CheckHiddenPowerType(indiv.HiddenPowerType)) return GCIndividual.Empty;
-            if (!criteria.CheckHiddenPowerPower(indiv.HiddenPower)) return GCIndividual.Empty;
+            var pid = _pidGenerator.Generate(ref seed);
 
-            return indiv.SetRepSeed(rep);
+            var indiv = Species.GetIndividual(pid, Lv, ivs, AbilityIndex, false);
+            if (!criteria.CheckGender(indiv.Gender)) return null;
+            if (!criteria.CheckNature(indiv.Nature)) return null;
+            if (!criteria.CheckShiny(indiv.PID.IsShiny(criteria.TSV))) return null;
+            if (!criteria.CheckHiddenPowerType(indiv.HiddenPowerType)) return null;
+            if (!criteria.CheckHiddenPowerPower(indiv.HiddenPower)) return null;
+
+            return indiv;
         }
-        public GCIndividual Generate(uint seed, uint TSV, Criteria criteria)
+        public GCIndividual Generate(uint seed, uint tsv, Criteria criteria)
         {
-            var rep = seed;
             seed.Advance(2); // dummyPID
-            uint[] IVs = seed.GetIVs();
-            if (!criteria.CheckIVs(IVs)) return GCIndividual.Empty;
+            uint[] IVs = seed.GenerateIVs();
+            if (!criteria.CheckIVs(IVs)) return null;
             uint AbilityIndex = seed.GetRand(2);
-            if (!criteria.CheckAbility(Pokemon.Ability[(int)AbilityIndex])) return GCIndividual.Empty;
-            uint PID;
-            while (true)
-            {
-                PID = seed.GetPID(_ => (FixedGender == Gender.Genderless || _.GetGender(Pokemon.GenderRatio) == FixedGender) && (FixedNature == Nature.other || (Nature)(_ % 25) == FixedNature));
+            if (!criteria.CheckAbility(Species.Ability[(int)AbilityIndex])) return null;
 
-                if (!PID.IsShiny(TSV)) break;
-            }
-            var indiv = Pokemon.GetIndividual(PID, Lv, IVs, AbilityIndex);
-            if (!criteria.CheckGender(indiv.Gender)) return GCIndividual.Empty;
-            if (!criteria.CheckNature(indiv.Nature)) return GCIndividual.Empty;
-            if (!criteria.CheckShiny(indiv.PID.IsShiny(criteria.TSV))) return GCIndividual.Empty;
-            if (!criteria.CheckHiddenPowerType(indiv.HiddenPowerType)) return GCIndividual.Empty;
-            if (!criteria.CheckHiddenPowerPower(indiv.HiddenPower)) return GCIndividual.Empty;
+            var pid = _pidGenerator.Generate(ref seed, tsv);
+            var indiv = Species.GetIndividual(pid, Lv, IVs, AbilityIndex, false);
+            if (!criteria.CheckGender(indiv.Gender)) return null;
+            if (!criteria.CheckNature(indiv.Nature)) return null;
+            if (!criteria.CheckShiny(indiv.PID.IsShiny(criteria.TSV))) return null;
+            if (!criteria.CheckHiddenPowerType(indiv.HiddenPowerType)) return null;
+            if (!criteria.CheckHiddenPowerPower(indiv.HiddenPower)) return null;
 
-            return indiv.SetRepSeed(rep);
+            return indiv;
         }
-
-        public GCIndividual GenerateDummy(ref uint seed, uint TSV)
+         
+        public GCIndividual GenerateDummy(ref uint seed, uint tsv)
         {
-            var rep = seed;
             seed.Advance(2);
-            uint[] IVs = seed.GetIVs();
-            uint AbilityIndex = seed.GetRand(2);
-            uint PID;
-            while (true)
-            {
-                PID = seed.GetPID(_ => (FixedGender == Gender.Genderless || _.GetGender(Pokemon.GenderRatio) == FixedGender) && (FixedNature == Nature.other || (Nature)(_ % 25) == FixedNature));
+            var ivs = seed.GenerateIVs();
+            var abilityIndex = seed.GetRand(2);
+            var pid = seed.Generate(_pidGenerator, tsv);
+            var evs = seed.GenerateEVs();
+            return Species.GetIndividual(pid, 100, ivs, evs, abilityIndex, false);
+        }
 
-                if (!PID.IsShiny(TSV)) break;
-            }
-            uint[] EVs = seed.GenerateEVs();
-            return Pokemon.GetIndividual(PID, 100, IVs, EVs, AbilityIndex).SetRepSeed(rep);
-        }
-        internal GCSlot(Pokemon.Species p, Gender g = Gender.Genderless, Nature n = Nature.other)
+        internal GCSlot(string name)
         {
-            Pokemon = p;
+            Species = Pokemon.GetPokemon(name);
             Lv = 50;
-            FixedGender = g;
-            FixedNature = n;
+            FixedGender = Gender.Genderless;
+            FixedNature = Nature.other;
+
+            _pidGenerator = new BasicPIDGenerator();
         }
-        internal GCSlot(Pokemon.Species p, uint lv, Gender g = Gender.Genderless, Nature n = Nature.other)
+        internal GCSlot(string name, Gender gender, Nature nature)
         {
-            Pokemon = p;
-            Lv = lv;
-            FixedGender = g;
-            FixedNature = n;
-        }
-        internal GCSlot(string name, Gender g = Gender.Genderless, Nature n = Nature.other)
-        {
-            Pokemon = PokemonStandardLibrary.Gen3.Pokemon.GetPokemon(name);
+            Species = Pokemon.GetPokemon(name);
             Lv = 50;
-            FixedGender = g;
-            FixedNature = n;
+            FixedGender = gender;
+            FixedNature = nature;
+
+            _pidGenerator = GetPIDGenerator(nature, Species, gender);
         }
         internal GCSlot(string name, uint lv, Gender g = Gender.Genderless, Nature n = Nature.other)
         {
-            Pokemon = PokemonStandardLibrary.Gen3.Pokemon.GetPokemon(name);
+            Species = Pokemon.GetPokemon(name);
             Lv = lv;
             FixedGender = g;
             FixedNature = n;
-        }
-    }
 
-    public class Slot
-    {
-        private readonly uint _lv;
-        private readonly Pokemon.Species _species;
-        private readonly Gender _fixedGender;
-        private readonly Nature _fixedNature;
-
-        public virtual GCIndividual Generate(uint seed, uint tsv = 0x10000)
-        {
-            seed.Advance(2); // dummyPID
-            var ivs = seed.GetIVs();
-            var abilityIndex = seed.GetRand(2);
-            var pid = seed.GetPID(tsv, _species.GenderRatio, _fixedGender, _fixedNature);
-
-            return _species.GetIndividual(pid, _lv, ivs, abilityIndex);
+            _pidGenerator = GetPIDGenerator(n, Species, g);
         }
 
-    }
-
-    public class BasicPIDGenerator : IGeneratableEffectful<uint, uint>
-    {
-        public uint Generate(ref uint seed, uint tsv)
+        private static IPIDGenerator GetPIDGenerator(Nature fixedNature, Pokemon.Species species, Gender fixedGender)
         {
-            var h16 = seed.GetRand();
-            var l16 = seed.GetRand();
-            var pid = (h16 << 16) | l16;
+            var genderIsFixed = fixedGender != Gender.Genderless && !species.GenderRatio.IsFixed();
+            var natureIsFixed = fixedNature != Nature.other;
 
-            // 高々3回しか呼ばれないので再帰にしてみた
-            if ((h16 ^ l16 ^ tsv) < 8) return Generate(ref seed, tsv);
+            if (genderIsFixed && natureIsFixed)
+                return new ConditionalPIDGenerator(fixedNature, species, fixedGender);
 
-            return pid;
-        }
-    }
-    public class NatureConditionalPIDGenerator : IGeneratableEffectful<uint, uint>
-    {
-        private readonly uint _fixedNature;
-        public uint Generate(ref uint seed, uint tsv)
-        {
-            while (true)
-            {
-                var h16 = seed.GetRand();
-                var l16 = seed.GetRand();
-                var pid = (h16 << 16) | l16;
+            if (genderIsFixed)
+                return new GenderConditionalPIDGenerator(species, fixedGender);
 
-                if (pid % 25 != _fixedNature) continue;
-                if ((h16 ^ l16 ^ tsv) < 8) continue;
-
-                return pid;
-            }
-        }
-
-        public NatureConditionalPIDGenerator(Nature fixedNature)
-            => _fixedNature = (uint)fixedNature;
-
-    }
-    public class ConditionalPIDGenerator : IGeneratableEffectful<uint, uint>
-    {
-        private readonly uint _genderRatio;
-        private readonly bool _fixedGenderIsFemale;
-        private readonly uint _fixedNature;
-        public uint Generate(ref uint seed, uint tsv)
-        {
-            while (true)
-            {
-                var h16 = seed.GetRand();
-                var l16 = seed.GetRand();
-                var pid = (h16 << 16) | l16;
-
-                if (pid % 25 != _fixedNature) continue;
-                if (((pid & 0xFF) < _genderRatio) != _fixedGenderIsFemale) continue;
-                if ((h16 ^ l16 ^ tsv) < 8) continue;
-
-                return pid;
-            }
-        }
-
-        public ConditionalPIDGenerator(Nature fixedNature, Pokemon.Species species, Gender fixedGender)
-        {
-            _genderRatio = (uint)species.GenderRatio;
-            _fixedGenderIsFemale = fixedGender == Gender.Female;
-            _fixedNature = (uint)fixedNature;
+            if (natureIsFixed)
+                return new NatureConditionalPIDGenerator(fixedNature);
+            
+            return new BasicPIDGenerator();
         }
     }
 
     static class GenerateModules
     {
-        public static uint GetPID(ref this uint seed, Func<uint, bool> condition)
-        {
-            uint PID;
-            do { PID = (seed.GetRand() << 16) | seed.GetRand(); } while (!condition(PID));
-            return PID;
-        }
-        public static uint GetPID(ref this uint seed, uint tsv, GenderRatio ratio, Gender fixedGender, Nature fixedNature)
-        {
-            while (true)
-            {
-                var pid = (seed.GetRand() << 16) | seed.GetRand();
-
-                if (fixedGender != Gender.Genderless && pid.GetGender(ratio) != fixedGender)
-                    continue;
-                if (fixedNature != Nature.other && (Nature)(pid % 25) != fixedNature)
-                    continue;
-                if (pid.IsShiny(tsv))
-                    continue;
-
-                return pid;
-            }
-        }
-        public static uint[] GetIVs(ref this uint seed)
+        public static uint[] GenerateIVs(ref this uint seed)
         {
             var hab = seed.GetRand();
             var scd = seed.GetRand();

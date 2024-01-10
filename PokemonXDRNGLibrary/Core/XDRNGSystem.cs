@@ -435,7 +435,7 @@ namespace PokemonXDRNGLibrary
             }));
             xdList.Add(new XDDarkPokemon("カビゴン", 43, new PreGenerateSlot[]
             {
-                new PreGenerateSlot("オオスバメ"),
+                new PreGenerateDarkPokemon("オオスバメ"),
                 new PreGenerateSlot("フーディン", Gender.Male, Nature.Quirky),
                 new PreGenerateSlot("キングドラ", Gender.Female, Nature.Docile),
                 new PreGenerateSlot("ヘラクロス", Gender.Female, Nature.Bashful),
@@ -529,7 +529,7 @@ namespace PokemonXDRNGLibrary
             }));
 
             XDDarkPokemonList = xdList;
-            XDDarkPokemonDictionary = xdList.ToDictionary(_ => _.darkPokemon.Pokemon.Name, _ => _);
+            XDDarkPokemonDictionary = xdList.ToDictionary(_ => _.darkPokemon.Species.Name, _ => _);
         }
     }
 }

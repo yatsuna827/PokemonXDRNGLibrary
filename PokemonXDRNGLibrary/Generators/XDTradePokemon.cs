@@ -15,10 +15,10 @@ namespace PokemonXDRNGLibrary
         public GCIndividual Generate(uint seed)
         {
             seed.Advance(10);
-            uint[] IVs = seed.GetIVs();
+            uint[] IVs = seed.GenerateIVs();
             uint AbilityIndex = seed.GetRand(2);
             uint PID = (seed.GetRand() << 16) | seed.GetRand();
-            return pokemon.GetIndividual(PID, Lv, IVs, AbilityIndex);
+            return pokemon.GetIndividual(PID, Lv, IVs, AbilityIndex, false);
         }
     }
 }

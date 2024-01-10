@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using PokemonPRNG.LCG32;
 using PokemonPRNG.LCG32.GCLCG;
-using PokemonStandardLibrary;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace PokemonXDRNGLibrary
 {
-    public class XDDarkPokemon
+    public class XDDarkPokemon : IGeneratable<GCIndividual>, IGeneratable<GCIndividual, uint>
     {
         private readonly uint lvBonus;
         public readonly GCSlot darkPokemon;
@@ -29,170 +29,162 @@ namespace PokemonXDRNGLibrary
         {
             seed.Advance(_angleGenerator);
 
-            uint DummyTSV = seed.GetRand() ^ seed.GetRand();
-            for (int i = 0; i < PreGeneratePokemons.Count; i++)
-            {
-                PreGeneratePokemons[i].Generate(seed, out seed);
-            }
-            return darkPokemon.Generate(ref seed);
+            seed.Advance(2); // enemyTSV
+            foreach (var p in PreGeneratePokemons)
+                seed.Advance(p);
+
+            return darkPokemon.Generate(seed);
         }
         public virtual GCIndividual Generate(uint seed, uint pTSV)
         {
-            uint r;
-            do { r = seed.GetRand(10); } while (r == 3); // トレーナーによっては他の値でもスキップ?
-            if (r == 8) seed.Advance(5); else if (r < 5) seed.Advance(); else seed.Advance(2);
+            seed.Advance(_angleGenerator);
 
-            uint DummyTSV = seed.GetRand() ^ seed.GetRand();
-            for (int i = 0; i < PreGeneratePokemons.Count; i++)
-            {
-                PreGeneratePokemons[i].Generate(seed, out seed, pTSV);
-            }
-            return darkPokemon.Generate(seed, out seed, pTSV);
+            seed.Advance(2); // enemyTSV
+            foreach (var p in PreGeneratePokemons)
+                seed.Advance(p, pTSV);
+
+            return darkPokemon.Generate(seed, tsv: pTSV);
         }
 
         public virtual GCIndividual Generate(uint seed, Criteria criteria)
         {
-            uint r;
-            do { r = seed.GetRand(10); } while (r == 3); // トレーナーによっては他の値でもスキップ?
-            if (r == 8) seed.Advance(5); else if (r < 5) seed.Advance(); else seed.Advance(2);
+            seed.Advance(_angleGenerator);
 
-            uint DummyTSV = seed.GetRand() ^ seed.GetRand();
-            for (int i = 0; i < PreGeneratePokemons.Count; i++)
-            {
-                PreGeneratePokemons[i].Generate(seed, out seed);
-            }
+            seed.Advance(2); // enemyTSV
+            foreach (var p in PreGeneratePokemons)
+                seed.Advance(p);
+
             return darkPokemon.Generate(seed, criteria);
         }
         public virtual GCIndividual Generate(uint seed, uint pTSV, Criteria criteria)
         {
-            uint r;
-            do { r = seed.GetRand() % 10; } while (r == 3); // トレーナーによっては他の値でもスキップ?
-            if (r == 8) seed.Advance(5); else if (r < 5) seed.Advance(); else seed.Advance(2);
+            seed.Advance(_angleGenerator);
 
-            uint DummyTSV = seed.GetRand() ^ seed.GetRand();
-            for (int i = 0; i < PreGeneratePokemons.Count; i++)
-            {
-                PreGeneratePokemons[i].Generate(seed, out seed, pTSV);
-            }
+            seed.Advance(2); // enemyTSV
+            foreach (var p in PreGeneratePokemons)
+                seed.Advance(p, pTSV);
+
             return darkPokemon.Generate(seed, pTSV, criteria);
         }
 
-        public IReadOnlyList<RNGTarget> SearchTarget(uint H, uint A, uint B, uint C, uint D, uint S, RNGTargetCriteria criteria)
-        {
-            var seedList = SeedFinder.FindGeneratingSeed(H, A, B, C, D, S, false).ToArray();
-            var resList = seedList.Select(_ => new RNGTarget(_, darkPokemon.Generate(_))).ToArray();
-
-            for (int k = 0; k < seedList.Length; k++)
-            {
-                if (criteria.HiddenPowerType != PokeType.None && 
-                    (resList[k].targetIndividual.HiddenPowerType & criteria.HiddenPowerType) == 0) continue;
-                if (resList[k].targetIndividual.HiddenPower < criteria.MinHiddenPower) continue;
-                if (criteria.ability != "" && resList[k].targetIndividual.Ability != criteria.ability) continue;
-                if (criteria.gender != Gender.Genderless && resList[k].targetIndividual.Gender != criteria.gender) continue;
-                if (!criteria.nature[(int)resList[k].targetIndividual.Nature]) continue;
-                var seed = seedList[k].PrevSeed(1024);
-                var genSeedList = new List<uint>();
-                for (int i = 0; i <= 1024; i++)
-                {
-                    var res = Generate(seed);
-                    if (res.RepresentativeSeed == seedList[k]) genSeedList.Add(seed);
-                    seed.Advance();
-                }
-                resList[k].generatableSeeds = genSeedList.ToArray();
-            }
-
-            return resList.Where(_=>_.generatableSeeds.Length != 0).ToArray();
-        }
-
         private static readonly AngleReverser _angleReverser = new AngleReverser();
-        public IReadOnlyList<RNGTarget> CalcBack(uint H, uint A, uint B, uint C, uint D, uint S, uint TSV = 0x10000)
+        public IReadOnlyList<RNGTarget> CalcBack(uint H, uint A, uint B, uint C, uint D, uint S)
         {
-            var preList = PreGeneratePokemons.Reverse().ToArray();
             var resList = new List<RNGTarget>();
 
-            var generatingSeedList = SeedFinder.FindGeneratingSeed(H, A, B, C, D, S, false);
-            foreach (var seed in generatingSeedList)
+            foreach (var seed in SeedFinder.FindGeneratingSeed(H, A, B, C, D, S, false))
             {
-                var PSV = (seed.NextSeed(6) >> 16) ^ (seed.NextSeed(7) >> 16);
-                var cells = new List<CalcBackCell>() { new CalcBackCell(seed) };
+                // 到達不可能な個体なら即座に次へ
+                // if (PreGeneratePokemons.Count > 0)
+                // {
+                //     var last = PreGeneratePokemons[PreGeneratePokemons.Count - 1];
+                //     if (!last.CanGeneratedBy(seed, 0x10000)) continue;
+                // }
 
-                // 事前生成されるポケモンの分
-                foreach (var pre in preList)
+                // 生成される個体の色回避発生前のSV
+                var psv = ((seed.NextSeed(6) >> 16) ^ (seed.NextSeed(7) >> 16)) & 0xFFF8;
+
+                var generalResult = new List<uint>(); // 色回避無し個体
+                var rerolledResult = new Dictionary<uint, List<uint>>(); // 色回避有り個体
+
+                var root = new PregenerateNode();
+
+                var queue = new Queue<(int Index, CalcBackCell Cell, PregenerateNode Parent)>();
+                queue.Enqueue((PreGeneratePokemons.Count - 1, new CalcBackCell(seed), root));
+                while (queue.Count > 0)
                 {
-                    var list = new List<CalcBackCell>();
-                    foreach (var cell in cells) list.AddRange(pre.CalcBack(cell));
+                    (var index, var cell, var parent) = queue.Dequeue();
 
-                    cells = list;
+                    var pregen = PreGeneratePokemons[index];
+                    if (!pregen.CanGeneratedBy(cell.Seed, cell.ConditionedTSV)) continue;
+
+                    var node = cell.ConditionedTSV == 0x10000 ? parent.CreateChild(cell.Seed) : new PregenerateNode(cell.Seed, parent);
+
+                    foreach (var _c in pregen.CalcBack(cell))
+                    {
+                        if (index == 0)
+                        {
+                            var seeds = _angleReverser.Reverse(_c.Seed.PrevSeed(2)).ToArray();
+
+                            // 到達可能な起点seedでグループ化して返したいのでここではyield returnしない
+
+                            // 位置ずれ前提の場合
+                            if (_c.ConditionedTSV != 0x10000)
+                            {
+                                if (node.CheckTSV(_c.ConditionedTSV))
+                                {
+                                    if (!rerolledResult.ContainsKey(_c.ConditionedTSV)) 
+                                        rerolledResult.Add(_c.ConditionedTSV, new List<uint>());
+                                    rerolledResult[_c.ConditionedTSV].AddRange(seeds);
+                                }
+                            }
+                            else
+                            {
+                                node.Feedback();
+                                generalResult.AddRange(seeds);
+                            }
+                        }
+                        else
+                        {
+                            queue.Enqueue((index - 1, _c, node));
+                        }
+                    }
                 }
 
-                // TSV生成の部分.
-                var genSeedList1 = new List<uint>(); // 色回避無し個体
-                var genSeedList2 = new List<uint>(); // 色回避有り個体
-                foreach (var cell in cells)
+                if (generalResult.Count > 0)
                 {
-                    if (TSV != 0x10000 && cell.preGeneratedPSVList.Any(_ => (_ ^ TSV) < 8)) continue; // 色回避が発生してしまうのでダメ~~~~~~~~
-                    if (cell.TSV != 0x10000 && (((TSV ^ cell.TSV) >= 8) || TSV == 0x10000)) continue; // TSV条件を満たさないのでダメ~~~~~~~~
-                    
-                    var seeds = _angleReverser.Reverse(cell.seed.PrevSeed(2)).ToArray();
-                    if (TSV == PSV) 
-                        genSeedList2.AddRange(seeds); 
-                    else 
-                        genSeedList1.AddRange(seeds);
+                    var list = root.GetContraindicatedTSVs(PreGeneratePokemons.Count);
+                    list.Add(psv);
+
+                    resList.Add(new RNGTarget(seed, darkPokemon.Generate(seed), generalResult.ToArray(), contraindicatedTSVs: list.ToArray()));
+                    resList.Add(new RNGTarget(seed, darkPokemon.Generate(seed, tsv: psv), generalResult.ToArray(), conditionedTSV: psv));
+                }
+                else
+                {
+                    // 普通では到達不能だが特定のTSVのみPreGenerateSlotの生成で色回避が発生して到達可能になるパターン
+                    // いわゆる位置ズレ
+                    // 普通に到達可能な場合は取り立てて結果に加える必要は無いと思う
+                    foreach (var rerolled in rerolledResult)
+                    {
+                        var tsv = rerolled.Key;
+                        var seeds = rerolled.Value.ToArray();
+
+                        resList.Add(new RNGTarget(seed, darkPokemon.Generate(seed, tsv), seeds, tsv));
+                    }
                 }
 
-                // TSV条件をreturnするのはまた今度にします...
-                if (genSeedList1.Count > 0) resList.Add(new RNGTarget(seed, darkPokemon.Generate(seed), genSeedList1.ToArray()));
-                if (genSeedList2.Count > 0) resList.Add(new RNGTarget(seed, darkPokemon.Generate(seed), genSeedList2.ToArray()));
             }
 
             return resList;
         }
 
-        protected virtual IEnumerable<uint> CalcBackAngle(uint seed)
+        public IEnumerable<RNGTarget> CalcBack(uint H, uint A, uint B, uint C, uint D, uint S, uint tsv)
         {
-            seed.Back(2); // 敵のTSV生成の分.
-
+            foreach (var generationSeed in SeedFinder.FindGeneratingSeed(H, A, B, C, D, S, false))
             {
-                var _seed = seed;
-                var r = _seed >> 16;
-                if (r < 5 && r != 3)
-                {
-                    yield return _seed.Back();
+                var results = new List<uint>(); // 色回避有り個体
 
-                    while(_seed >> 16 == 3)
+                var stack = new Stack<(int Index, uint Seed)>();
+                stack.Push((PreGeneratePokemons.Count, generationSeed));
+                while (stack.Count > 0)
+                {
+                    (var index, var seed) = stack.Pop();
+                    if (index-- == 0)
                     {
-                        yield return _seed.Back();
+                        // 到達可能な起点seedでグループ化して返したいのでここではyield returnしない
+                        results.AddRange(_angleReverser.Reverse(seed.PrevSeed(2)));
+                    }
+                    else
+                    {
+                        foreach (var nextSeed in PreGeneratePokemons[index].CalcBack(seed, tsv))
+                            stack.Push((index, nextSeed));
                     }
                 }
-            }
 
-            {
-                var _seed = seed;
-                var r = _seed.Back() >> 16;
-                if (r >= 5 && r != 8)
-                {
-                    yield return _seed.Back();
-
-                    while (_seed >> 16 == 3)
-                    {
-                        yield return _seed.Back();
-                    }
-                }
-            }
-
-            {
-                var _seed = seed;
-                if ((_seed.Back(4) >> 16) == 8)
-                {
-                    yield return _seed.Back();
-
-                    while ((_seed >> 16) == 3)
-                    {
-                        yield return _seed.Back();
-                    }
-                }
+                if (results.Count > 0) yield return new RNGTarget(generationSeed, darkPokemon.Generate(generationSeed, tsv), results.ToArray());
             }
         }
+
     }
 
     class XDTogepii : XDDarkPokemon
@@ -206,7 +198,7 @@ namespace PokemonXDRNGLibrary
         }
         public override GCIndividual Generate(uint seed, uint pTSV)
         {
-            return darkPokemon.Generate(seed, out seed, pTSV);
+            return darkPokemon.Generate(seed, pTSV);
         }
 
         public override GCIndividual Generate(uint seed, Criteria criteria)

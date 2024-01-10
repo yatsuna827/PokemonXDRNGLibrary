@@ -9,20 +9,19 @@ namespace PokemonXDRNGLibrary
     public class RNGTarget
     {
         public uint[] generatableSeeds;
-        public GCIndividual[] preGeneratePokemons;
         public GCIndividual targetIndividual;
         public readonly uint representativeSeed;
-        public RNGTarget(uint repSeed, GCIndividual indiv)
-        {
-            representativeSeed = repSeed;
-            targetIndividual = indiv;
-            generatableSeeds = new uint[0];
-        }
-        public RNGTarget(uint repSeed, GCIndividual indiv, uint[] genSeeds)
+
+        public uint? ConditionedTSV { get; }
+        public uint[] ContraindicatedTSVs { get; }
+
+        public RNGTarget(uint repSeed, GCIndividual indiv, uint[] genSeeds, uint? conditionedTSV = null, uint[] contraindicatedTSVs = null)
         {
             representativeSeed = repSeed;
             targetIndividual = indiv;
             generatableSeeds = genSeeds;
+            ConditionedTSV = conditionedTSV;
+            ContraindicatedTSVs = contraindicatedTSVs ?? Array.Empty<uint>();
         }
     }
 }

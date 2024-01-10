@@ -18,14 +18,13 @@ namespace PokemonXDRNGLibrary
 
         public GCIndividual Generate(uint seed, uint pid)
         {
-            var rep = seed;
             seed.Advance(3); // dummyTSV, and ???
             var lv = BaseLv + seed.GetRand(VariableLv);
             seed.Advance(2); // dummyPID
-            var ivs = seed.GetIVs();
+            var ivs = seed.GenerateIVs();
             var abilityIndex = seed.GetRand(2);
             
-            return Species.GetIndividual(pid, lv, ivs, abilityIndex).SetRepSeed(rep);
+            return Species.GetIndividual(pid, lv, ivs, abilityIndex, false);
         }
 
         public PokeSpotSlot(string name, uint baseLv, uint LvRange)
