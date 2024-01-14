@@ -15,16 +15,22 @@ while (true)
 
 static void Hoge()
 {
-    var tama = XDRNGSystem.GetDarkPokemon("ボーマンダ");
-    //foreach (var d in tama.PreGeneratePokemons.OfType<PreGenerateDarkPokemon>()) d.isFixed = true;
+    var tama = XDRNGSystem.GetDarkPokemon("サンダー");
+    foreach (var d in tama.PreGeneratePokemons.OfType<PreGenerateDarkPokemon>()) d.isFixed = true;
 
     for (uint c = 0; c < 32; c++)
     {
-        foreach (var result in tama.CalcBack(30, 30, 30, c, 30, 31).Where(_ => _.targetIndividual.HiddenPower == 70))
+        foreach (var result in tama.CalcBack(31, 31, 31, c, 31, 31))
         {
             var id = result.ConditionedTSV == null ? $"{string.Join(",", result.ContraindicatedTSVs)}以外" : $"{result.ConditionedTSV}";
             WriteLine($"{result.representativeSeed:X8} {string.Join("-", result.targetIndividual.IVs)} {result.targetIndividual.Nature.ToJapanese()} TSV: {id}");
-            foreach (var seed in result.generatableSeeds) WriteLine($"{seed:X8}");
+
+            if (result.generatableSeeds.Length > 0)
+                WriteLine($"{result.generatableSeeds.Length} {result.generatableSeeds.Last():X8} {result.generatableSeeds.First():X8}");
+            else
+                WriteLine("cannot reach");
+            
+            //foreach (var seed in result.generatableSeeds) WriteLine($"{seed:X8}");
         }
     }
 

@@ -72,8 +72,6 @@ namespace PokemonXDRNGLibrary
 
         public virtual bool CanGeneratedBy(uint seed, uint tsv)
         {
-            var _seed = seed;
-
             var lid = seed >> 16;
             var hid = seed.Back() >> 16;
             var pid = hid << 16 | lid;
@@ -83,6 +81,13 @@ namespace PokemonXDRNGLibrary
             if ((lid ^ hid ^ tsv) < 8) return false; // 色回避に引っかかってしまう場合
 
             return true;
+        }
+
+        internal virtual PregenerateNode CreateNode(CalcBackCell cell, PregenerateNode parent)
+        {
+            return cell.ConditionedTSV == 0x10000
+                ? parent.CreateChild(cell.Seed, false)
+                : new PregenerateNode(cell.Seed, parent);
         }
     }
 
@@ -95,10 +100,9 @@ namespace PokemonXDRNGLibrary
 
         public override void Use(ref uint seed)
         {
-            if (isFixed) 
-                seed.Advance(3); // dummyPID, ability
-            else 
-                seed.Advance(5); // dummyPID, IVs, ability
+            seed.Advance(5); // dummyPID, IVs, ability
+
+            if (isFixed) return;
 
             while (true)
             {
@@ -112,10 +116,9 @@ namespace PokemonXDRNGLibrary
         }
         public override uint ComputeConsumption(uint seed)
         {
-            if (isFixed)
-                seed.Advance(3); // dummyPID, ability
-            else
-                seed.Advance(5); // dummyPID, IVs, ability
+            seed.Advance(5); // dummyPID, IVs, ability
+
+            if (isFixed) return seed;
 
             while (true)
             {
@@ -132,10 +135,9 @@ namespace PokemonXDRNGLibrary
 
         public override void Use(ref uint seed, uint TSV)
         {
-            if (isFixed)
-                seed.Advance(3); // dummyPID, ability
-            else
-                seed.Advance(5); // dummyPID, IVs, ability
+            seed.Advance(5); // dummyPID, IVs, ability
+
+            if (isFixed) return;
 
             while (true)
             {
@@ -152,10 +154,9 @@ namespace PokemonXDRNGLibrary
         }
         public override uint ComputeConsumption(uint seed, uint TSV)
         {
-            if (isFixed)
-                seed.Advance(3); // dummyPID, ability
-            else
-                seed.Advance(5); // dummyPID, IVs, ability
+            seed.Advance(5); // dummyPID, IVs, ability
+
+            if (isFixed) return seed;
 
             while (true)
             {
@@ -175,13 +176,19 @@ namespace PokemonXDRNGLibrary
 
         internal override IEnumerable<CalcBackCell> CalcBack(CalcBackCell cell)
         {
+            if (isFixed)
+            {
+                yield return new CalcBackCell(cell.Seed.PrevSeed(5u), cell.ConditionedTSV);
+                yield break;
+            }
+
             var seed = cell.Seed.PrevSeed();
             var TSV = cell.ConditionedTSV;
 
             // 逆算
             while (true)
             {
-                yield return new CalcBackCell(seed.PrevSeed(isFixed ? 4u : 6u), TSV);
+                yield return new CalcBackCell(seed.PrevSeed(6u), TSV);
                 // 条件を満たすPIDに当たるまで, seedを返し続ける.
                 var lid = seed.Back() >> 16;
                 var hid = seed.Back() >> 16;
@@ -198,6 +205,12 @@ namespace PokemonXDRNGLibrary
 
         internal override IEnumerable<uint> CalcBack(uint seed, uint tsv)
         {
+            if (isFixed)
+            {
+                yield return seed.PrevSeed(5u);
+                yield break;
+            }
+
             // PIDのチェック.
             // PIDが条件を満たしていなければyield break.
             {
@@ -220,6 +233,8 @@ namespace PokemonXDRNGLibrary
 
         public override bool CanGeneratedBy(uint seed, uint tsv)
         {
+            if (isFixed) return true;
+
             var lid = seed >> 16;
             var hid = seed.Back() >> 16;
 
@@ -228,6 +243,16 @@ namespace PokemonXDRNGLibrary
 
             return true;
         }
+
+        internal override PregenerateNode CreateNode(CalcBackCell cell, PregenerateNode parent)
+        {
+            if (isFixed) return new PregenerateNode(parent);
+
+            return cell.ConditionedTSV == 0x10000
+                ? parent.CreateChild(cell.Seed, isFixed)
+                : new PregenerateNode(cell.Seed, parent);
+        }
     }
+
 
 }

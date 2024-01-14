@@ -74,13 +74,6 @@ namespace PokemonXDRNGLibrary
 
             foreach (var seed in SeedFinder.FindGeneratingSeed(H, A, B, C, D, S, false))
             {
-                // 到達不可能な個体なら即座に次へ
-                // if (PreGeneratePokemons.Count > 0)
-                // {
-                //     var last = PreGeneratePokemons[PreGeneratePokemons.Count - 1];
-                //     if (!last.CanGeneratedBy(seed, 0x10000)) continue;
-                // }
-
                 // 生成される個体の色回避発生前のSV
                 var psv = ((seed.NextSeed(6) >> 16) ^ (seed.NextSeed(7) >> 16)) & 0xFFF8;
 
@@ -98,7 +91,7 @@ namespace PokemonXDRNGLibrary
                     var pregen = PreGeneratePokemons[index];
                     if (!pregen.CanGeneratedBy(cell.Seed, cell.ConditionedTSV)) continue;
 
-                    var node = cell.ConditionedTSV == 0x10000 ? parent.CreateChild(cell.Seed) : new PregenerateNode(cell.Seed, parent);
+                    var node = pregen.CreateNode(cell, parent);
 
                     foreach (var _c in pregen.CalcBack(cell))
                     {
@@ -134,22 +127,30 @@ namespace PokemonXDRNGLibrary
                 if (generalResult.Count > 0)
                 {
                     var list = root.GetContraindicatedTSVs(PreGeneratePokemons.Count);
-                    list.Add(psv);
-
-                    resList.Add(new RNGTarget(seed, darkPokemon.Generate(seed), generalResult.ToArray(), contraindicatedTSVs: list.ToArray()));
-                    resList.Add(new RNGTarget(seed, darkPokemon.Generate(seed, tsv: psv), generalResult.ToArray(), conditionedTSV: psv));
+                    // 色回避を起こして到達不可能になるTSVと、生成される個体の色回避が発生するTSVが同じであれば、色回避個体は到達不可能
+                    if (!list.Contains(psv))
+                    {
+                        list.Add(psv);
+                        resList.Add(new RNGTarget(seed, darkPokemon.Generate(seed), generalResult.ToArray(), contraindicatedTSVs: list.ToArray()));
+                        resList.Add(new RNGTarget(seed, darkPokemon.Generate(seed, tsv: psv), generalResult.ToArray(), conditionedTSV: psv));
+                    }
+                    else
+                    {
+                        resList.Add(new RNGTarget(seed, darkPokemon.Generate(seed), generalResult.ToArray(), contraindicatedTSVs: list.ToArray()));
+                    }
                 }
-                else
+                else if (rerolledResult.Count > 0)
                 {
                     // 普通では到達不能だが特定のTSVのみPreGenerateSlotの生成で色回避が発生して到達可能になるパターン
                     // いわゆる位置ズレ
                     // 普通に到達可能な場合は取り立てて結果に加える必要は無いと思う
+                    // 
                     foreach (var rerolled in rerolledResult)
                     {
                         var tsv = rerolled.Key;
                         var seeds = rerolled.Value.ToArray();
-
-                        resList.Add(new RNGTarget(seed, darkPokemon.Generate(seed, tsv), seeds, tsv));
+                        if (seeds.Length > 0)
+                            resList.Add(new RNGTarget(seed, darkPokemon.Generate(seed, tsv), seeds, tsv));
                     }
                 }
 

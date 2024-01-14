@@ -18,7 +18,7 @@ namespace PokemonXDRNGLibrary
         public CalcBackCell(uint seed, uint tsv)
         {
             Seed = seed;
-            ConditionedTSV = tsv;
+            ConditionedTSV = tsv == 0x10000 ? tsv : tsv & 0xFFF8;
         }
 
     }
@@ -29,12 +29,16 @@ namespace PokemonXDRNGLibrary
         private readonly List<PregenerateNode> _children = new List<PregenerateNode>();
 
         private bool _hasPath;
+        private bool _pidSkipped;
 
         public uint GeneratedPSV { get; }
 
-        public PregenerateNode CreateChild(uint seed)
+        public PregenerateNode CreateChild(uint seed, bool pidSkipped)
         {
-            var child = new PregenerateNode(seed, this);
+            var child = pidSkipped
+                ? new PregenerateNode(this)
+                : new PregenerateNode(seed, this);
+
             _children.Add(child);
 
             return child;
@@ -64,6 +68,7 @@ namespace PokemonXDRNGLibrary
             }
         }
 
+        // 固定済みダークポケモンのPIDは無視する
         public List<uint> GetContraindicatedTSVs(int depth)
         {
             var result = new List<uint>();
@@ -79,7 +84,8 @@ namespace PokemonXDRNGLibrary
             while (queue.Count > 0)
             {
                 var (d, node) = queue.Dequeue();
-                tower[d].Add(node);
+                if (!node._pidSkipped)
+                    tower[d].Add(node);
 
                 foreach (var c in node._children)
                     queue.Enqueue((d + 1, c));
@@ -102,6 +108,12 @@ namespace PokemonXDRNGLibrary
         }
 
         public PregenerateNode() { }
+        public PregenerateNode(PregenerateNode parent)
+        {
+            _parent = parent;
+
+            _pidSkipped = true;
+        }
         public PregenerateNode(uint seed, PregenerateNode parent)
         {
             _parent = parent;

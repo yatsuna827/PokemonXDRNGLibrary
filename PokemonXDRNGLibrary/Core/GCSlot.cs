@@ -45,8 +45,7 @@ namespace PokemonXDRNGLibrary
         {
             seed.Advance(5); // dummyPID, IVs, ability
 
-            var pid = _pidGenerator.Generate(ref seed);
-            Console.WriteLine($"{pid:X8}");
+            _pidGenerator.Generate(ref seed);
 
             return seed;
         }
