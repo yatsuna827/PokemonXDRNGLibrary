@@ -170,12 +170,60 @@ namespace Test
                 Assert.Equal(expectedPID, result.targetIndividual.PID);
                 Assert.Equal(new uint[] { 31, 31, 31, 4, 31, 31 }, result.targetIndividual.IVs);
                 Assert.Equal(280, result.generatableSeeds.Length);
-                Assert.All(result.generatableSeeds, (_) =>
+
+                if (result.ConditionedTSV != null)
                 {
-                    var pid = result.ConditionedTSV != null ? dragonite.Generate(_, result.ConditionedTSV.Value).PID : dragonite.Generate(_).PID;
-                    Assert.Equal(expectedPID, pid);
-                });
+                    Assert.Equal(41656u, result.ConditionedTSV);
+                    Assert.All(result.generatableSeeds, (_) =>
+                    {
+                        var pid = dragonite.Generate(_, result.ConditionedTSV.Value).PID;
+                        Assert.Equal(expectedPID, pid);
+                    });
+                }
+                else
+                {
+                    Assert.Equal(new uint[] { 56680, 41656 }, result.ContraindicatedTSVs);
+                    Assert.All(result.generatableSeeds, (_) =>
+                    {
+                        var pid = dragonite.Generate(_).PID;
+                        Assert.Equal(expectedPID, pid);
+                    });
+                }
             });
+        }
+
+        [Fact]
+        public void TestReverseDragoniteContraindicatedTSVs()
+        {
+            var dragonite = XDRNGSystem.GetDarkPokemon("カイリュー");
+
+            var results = dragonite.CalcBack(31, 31, 31, 7, 31, 31).Where(_ => _.ConditionedTSV == null).ToArray();
+            Assert.Single(results);
+
+            var result = results[0];
+
+            Assert.Equal(new uint[] { 55120, 9184, 40056, 17120, 21216, 36480 }.OrderBy(_ => _), result.ContraindicatedTSVs.OrderBy(_ => _));
+        }
+
+        public static IEnumerable<object[]> TestCasesOfTestReverseWeepinbellContraindicatedTSVs()
+        {
+            static object[] Case(uint c, uint[] expectedTSVs) => new object[] { c, expectedTSVs };
+
+            yield return Case(c: 6, expectedTSVs: new uint[] { 47136, 59448, 49144, 59696 });
+            yield return Case(c: 29, expectedTSVs: new uint[] { 40880, 23520, 62120 });
+        }
+        [Theory]
+        [MemberData(nameof(TestCasesOfTestReverseWeepinbellContraindicatedTSVs))]
+        public void TestReverseWeepinbellContraindicatedTSVs(uint c, uint[] expectedTSVs)
+        {
+            var weepinbell = XDRNGSystem.GetDarkPokemon("ウツドン");
+
+            var results = weepinbell.CalcBack(31, 31, 31, c, 31, 31).Where(_ => _.ConditionedTSV == null).ToArray();
+            Assert.Single(results);
+
+            var result = results[0];
+
+            Assert.Equal(expectedTSVs.OrderBy(_ => _), result.ContraindicatedTSVs.OrderBy(_ => _));
         }
 
         [Fact]
@@ -215,6 +263,8 @@ namespace Test
                 });
             }
         }
+
+
     }
 
 }

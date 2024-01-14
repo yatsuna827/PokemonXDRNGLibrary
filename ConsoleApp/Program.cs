@@ -16,7 +16,7 @@ while (true)
 static void Hoge()
 {
     var tama = XDRNGSystem.GetDarkPokemon("サンダー");
-    foreach (var d in tama.PreGeneratePokemons.OfType<PreGenerateDarkPokemon>()) d.isFixed = true;
+    //foreach (var d in tama.PreGeneratePokemons.OfType<PreGenerateDarkPokemon>()) d.isFixed = true;
 
     for (uint c = 0; c < 32; c++)
     {
