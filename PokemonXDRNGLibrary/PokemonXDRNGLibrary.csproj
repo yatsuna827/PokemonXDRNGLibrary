@@ -7,7 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="PokemonPRNG" Version="3.11.0" />
+    <PackageReference Include="PokemonPRNG.LCG32.Core" Version="1.0.0" />
+    <PackageReference Include="PokemonPRNG.LCG32.GCLCG" Version="1.0.0" />
     <PackageReference Include="PokemonStandardLibrary" Version="1.4.0" />
     <PackageReference Include="PokemonStandardLibrary.Gen3" Version="1.2.0" />
   </ItemGroup>
