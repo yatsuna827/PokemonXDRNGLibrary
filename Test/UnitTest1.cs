@@ -265,6 +265,25 @@ namespace Test
         }
 
 
+        // 生成順1のダークポケモン
+        [Fact]
+        public void TestReverseRhydon()
+        {
+            var rhydon = XDRNGSystem.GetDarkPokemon("サイドン");
+
+            var results = rhydon.CalcBack(31, 31, 31, 31, 31, 31).ToArray();
+
+            Assert.Equal(4, results.Length);
+
+            Assert.All(results, (result) =>
+            {
+                Assert.Equal(new uint[] { 31, 31, 31, 31, 31, 31 }, result.targetIndividual.IVs);
+
+                var r = rhydon.Generate(result.generatableSeeds[0], result.ConditionedTSV ?? 0x10000);
+                Assert.Equal(new uint[] { 31, 31, 31, 31, 31, 31 }, r.IVs);
+            });
+        }
+
     }
 
 }

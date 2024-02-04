@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using PokemonPRNG.LCG32;
 using PokemonPRNG.LCG32.GCLCG;
 using static System.Net.Mime.MediaTypeNames;
@@ -82,44 +83,52 @@ namespace PokemonXDRNGLibrary
 
                 var root = new PregenerateNode();
 
-                var queue = new Queue<(int Index, CalcBackCell Cell, PregenerateNode Parent)>();
-                queue.Enqueue((PreGeneratePokemons.Count - 1, new CalcBackCell(seed), root));
-                while (queue.Count > 0)
+                if (PreGeneratePokemons.Count == 0)
                 {
-                    (var index, var cell, var parent) = queue.Dequeue();
-
-                    var pregen = PreGeneratePokemons[index];
-                    if (!pregen.CanGeneratedBy(cell.Seed, cell.ConditionedTSV)) continue;
-
-                    var node = pregen.CreateNode(cell, parent);
-
-                    foreach (var _c in pregen.CalcBack(cell))
+                    var seeds = _angleReverser.Reverse(seed.PrevSeed(2)).ToArray();
+                    generalResult.AddRange(seeds);
+                }
+                else
+                {
+                    var queue = new Queue<(int Index, CalcBackCell Cell, PregenerateNode Parent)>();
+                    queue.Enqueue((PreGeneratePokemons.Count - 1, new CalcBackCell(seed), root));
+                    while (queue.Count > 0)
                     {
-                        if (index == 0)
+                        (var index, var cell, var parent) = queue.Dequeue();
+
+                        var pregen = PreGeneratePokemons[index];
+                        if (!pregen.CanGeneratedBy(cell.Seed, cell.ConditionedTSV)) continue;
+
+                        var node = pregen.CreateNode(cell, parent);
+
+                        foreach (var _c in pregen.CalcBack(cell))
                         {
-                            var seeds = _angleReverser.Reverse(_c.Seed.PrevSeed(2)).ToArray();
-
-                            // 到達可能な起点seedでグループ化して返したいのでここではyield returnしない
-
-                            // 位置ずれ前提の場合
-                            if (_c.ConditionedTSV != 0x10000)
+                            if (index == 0)
                             {
-                                if (node.CheckTSV(_c.ConditionedTSV))
+                                var seeds = _angleReverser.Reverse(_c.Seed.PrevSeed(2)).ToArray();
+
+                                // 到達可能な起点seedでグループ化して返したいのでここではyield returnしない
+
+                                // 位置ずれ前提の場合
+                                if (_c.ConditionedTSV != 0x10000)
                                 {
-                                    if (!rerolledResult.ContainsKey(_c.ConditionedTSV)) 
-                                        rerolledResult.Add(_c.ConditionedTSV, new List<uint>());
-                                    rerolledResult[_c.ConditionedTSV].AddRange(seeds);
+                                    if (node.CheckTSV(_c.ConditionedTSV))
+                                    {
+                                        if (!rerolledResult.ContainsKey(_c.ConditionedTSV))
+                                            rerolledResult.Add(_c.ConditionedTSV, new List<uint>());
+                                        rerolledResult[_c.ConditionedTSV].AddRange(seeds);
+                                    }
+                                }
+                                else
+                                {
+                                    node.Feedback();
+                                    generalResult.AddRange(seeds);
                                 }
                             }
                             else
                             {
-                                node.Feedback();
-                                generalResult.AddRange(seeds);
+                                queue.Enqueue((index - 1, _c, node));
                             }
-                        }
-                        else
-                        {
-                            queue.Enqueue((index - 1, _c, node));
                         }
                     }
                 }
@@ -153,7 +162,6 @@ namespace PokemonXDRNGLibrary
                             resList.Add(new RNGTarget(seed, darkPokemon.Generate(seed, tsv), seeds, tsv));
                     }
                 }
-
             }
 
             return resList;
