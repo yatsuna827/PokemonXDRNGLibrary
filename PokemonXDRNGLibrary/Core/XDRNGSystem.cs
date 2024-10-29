@@ -37,6 +37,27 @@ namespace PokemonXDRNGLibrary
             return EVs;
         }
 
+        // see https://sina-poke.hatenablog.com/entry/2022/04/23/021304
+        public static uint[] GenerateEVsDummy(ref this uint seed)
+        {
+            uint[] EVs = new uint[6];
+            for (int i = 0; i < 101; i++)
+            {
+                uint sumEV = 0;
+                for (int j = 0; j < 6; j++)
+                {
+                    EVs[j] += seed.GetRand() & 0xFF;
+                    sumEV += EVs[j];
+                }
+
+                if (sumEV <= 510) return EVs;
+                else if (i >= 100) continue;
+                else EVs = new uint[6];
+            }
+
+            return EVs;
+        }
+
         internal static readonly IReadOnlyList<XDDarkPokemon> XDDarkPokemonList;
         internal static readonly Dictionary<string, XDDarkPokemon> XDDarkPokemonDictionary;
 
