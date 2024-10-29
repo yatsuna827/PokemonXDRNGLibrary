@@ -2,22 +2,21 @@
 using PokemonStandardLibrary;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace PokemonXDRNGLibrary.GroupBattle
 {
     // see https://sina-poke.hatenablog.com/entry/2022/04/23/021304
     public class GroupBattleGenerator
     {
-        private static readonly GCSlot[] dummies = new GCSlot[]
-        {
-            new GCSlot("Dummy", "Genderless"),
-            new GCSlot("Dummy", "M1F1", Gender.Male, Nature.Impish),
-            new GCSlot("Dummy", "M3F1", Gender.Male, Nature.Impish),
-            new GCSlot("Dummy", "Genderless", Gender.Genderless, Nature.Naive),
-            new GCSlot("Dummy", "Genderless", Gender.Genderless, Nature.Relaxed),
-            new GCSlot("Dummy", "M1F1", Gender.Male, Nature.Rash)
-        };
+        private static readonly GCSlot dummyGenderless = new GCSlot("Dummy", "Genderless");
+        private static readonly GCSlot dummyM1F1MaleImpish = new GCSlot("Dummy", "M1F1", Gender.Male, Nature.Impish);
+        private static readonly GCSlot dummyM3F1MaleImpish = new GCSlot("Dummy", "M3F1", Gender.Male, Nature.Impish);
+        private static readonly GCSlot dummyGenderlessNaive = new GCSlot("Dummy", "Genderless", Gender.Genderless, Nature.Naive);
+        private static readonly GCSlot dummyGenderlessRelaxed = new GCSlot("Dummy", "Genderless", Gender.Genderless, Nature.Relaxed);
+        private static readonly GCSlot dummyM1F1MaleRash = new GCSlot("Dummy", "M1F1", Gender.Male, Nature.Rash);
 
         private readonly uint _tsv;
 
@@ -31,29 +30,29 @@ namespace PokemonXDRNGLibrary.GroupBattle
 
             for (int i = 0; i < 3; i++)
             {
-                dummies[0].Use(ref seed, tsv);
+                dummyGenderless.Use(ref seed, tsv);
                 seed.GenerateEVsDummy();
             }
 
-            dummies[1].Use(ref seed, tsv);
-            dummies[1].Use(ref seed, tsv);
-            dummies[2].Use(ref seed, tsv);
+            dummyM1F1MaleImpish.Use(ref seed, tsv);
+            dummyM1F1MaleImpish.Use(ref seed, tsv);
+            dummyM3F1MaleImpish.Use(ref seed, tsv);
 
             tid = seed.GetRand();
             sid = seed.GetRand();
             tsv = tid ^ sid;
 
-            dummies[0].Use(ref seed, tsv);
+            dummyGenderless.Use(ref seed, tsv);
             seed.GenerateEVsDummy();
 
-            dummies[3].Use(ref seed, tsv);
+            dummyGenderlessNaive.Use(ref seed, tsv);
 
             tid = seed.GetRand();
             sid = seed.GetRand();
             tsv = tid ^ sid;
 
-            dummies[4].Use(ref seed, tsv);
-            dummies[5].Use(ref seed, tsv);
+            dummyGenderlessRelaxed.Use(ref seed, tsv);
+            dummyM1F1MaleRash.Use(ref seed, tsv);
 
             tid = seed.GetRand();
             sid = seed.GetRand();
@@ -61,7 +60,7 @@ namespace PokemonXDRNGLibrary.GroupBattle
 
             for (int i = 0; i < 2; i++)
             {
-                dummies[0].Use(ref seed, tsv);
+                dummyGenderless.Use(ref seed, tsv);
                 seed.GenerateEVsDummy();
             }
 

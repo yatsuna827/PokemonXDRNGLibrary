@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PokemonXDRNGLibrary.AdvanceSource
+namespace PokemonXDRNGLibrary.AdvancePlanning
 {
     public enum Menus
     {
@@ -35,9 +35,9 @@ namespace PokemonXDRNGLibrary.AdvanceSource
 
         public MenuInput(Menus menu, uint advances, uint nextSeed)
         {
-            this.Menu = menu;
-            this.Advances = advances;
-            this.NextSeed = nextSeed;
+            Menu = menu;
+            Advances = advances;
+            NextSeed = nextSeed;
         }
 
         public override string ToString() // makes looking at debug values easier
@@ -126,7 +126,7 @@ namespace PokemonXDRNGLibrary.AdvanceSource
         private uint NameScreen(uint seed) => seed.NextSeed(2);
 
         // best to keep targetAdvances in the range of ]0:150000] 
-        public List<Queue<MenuInput>> FindPaths(uint startSeed, uint targetAdvances, bool palVersion, Menus start,  uint maxNameScreens, uint maxRumbleSaves, CancellationToken token)
+        public List<Queue<MenuInput>> FindPaths(uint startSeed, uint targetAdvances, bool palVersion, Menus start, uint maxNameScreens, uint maxRumbleSaves, CancellationToken token)
         {
             var path = new Queue<MenuInput>();
             attemptedPaths?.Clear();

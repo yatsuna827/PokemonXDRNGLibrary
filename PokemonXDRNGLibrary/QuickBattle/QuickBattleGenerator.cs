@@ -22,10 +22,7 @@ namespace PokemonXDRNGLibrary.QuickBattle
             (new GCSlot("ラティアス"), new GCSlot("ゲンガー")),
         };
 
-        private static readonly GCSlot[] dummies = new GCSlot[]
-        {
-            new GCSlot("Dummy", "Genderless")
-        };
+        private static readonly GCSlot dummy = new GCSlot("Dummy", "Genderless");
 
         private static readonly string[] battleField = new [] { "パイラ", "ラルガ", "バトル山", "岩場", "オアシス", "洞窟" };
 
@@ -56,8 +53,6 @@ namespace PokemonXDRNGLibrary.QuickBattle
                 playerTeam[playerTeamIndex].First.GenerateDummy(ref seed, _tsv),
                 playerTeam[playerTeamIndex].Second.GenerateDummy(ref seed, _tsv)
             );
-
-            GenerateDummy(ref seed, ref playerTSV, pTeam.Item1.PID, pTeam.Item2.PID);
 
             return new QuickBattleResult(pTeam, eTeam, field, ((PlayerTeam)playerTeamIndex, (EnemyTeam)enemyTeamIndex));
         }
@@ -122,8 +117,6 @@ namespace PokemonXDRNGLibrary.QuickBattle
                 selectedTable[player1TeamIndex].Second.GenerateDummy(ref seed, _tsv)
             );
 
-            GenerateDummy(ref seed, ref player1TSV, p1Team.Item1.PID, p1Team.Item2.PID);
-
             return new TwoPlayerResult(p1Team, p2Team, field);
         }
 
@@ -180,7 +173,7 @@ namespace PokemonXDRNGLibrary.QuickBattle
 
                 for (int j = 0; j < 2; j++)
                 {
-                    dummies[0].Use(ref seed, tsv);
+                    dummy.Use(ref seed, tsv);
                     seed.GenerateEVsDummy();
                 }
             }
