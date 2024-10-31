@@ -19,7 +19,7 @@ namespace PokemonXDRNGLibrary
             this.GCAbility = species.Ability[(int)gcAbility];
             this.ShinySkipped = shinySkipped;
         }
-        internal GCIndividual(Pokemon.Species species, uint pid, uint[] ivs, uint[] evs, uint lv, uint gcAbility, bool shinySkipped) : base(species, pid, ivs, lv)
+        internal GCIndividual(Pokemon.Species species, uint pid, uint[] ivs, uint[] evs, uint lv, uint gcAbility, bool shinySkipped) : base(species, pid, ivs, lv, evs)
         {
             this.GCAbility = species.Ability[(int)gcAbility];
             this.ShinySkipped = shinySkipped;
