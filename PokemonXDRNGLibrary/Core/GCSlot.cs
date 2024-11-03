@@ -4,6 +4,8 @@ using PokemonStandardLibrary;
 using PokemonStandardLibrary.Gen3;
 using PokemonStandardLibrary.CommonExtension;
 using System;
+using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace PokemonXDRNGLibrary
 {
@@ -123,9 +125,27 @@ namespace PokemonXDRNGLibrary
 
             _pidGenerator = new BasicPIDGenerator();
         }
+        internal GCSlot(string name, string form)
+        {
+            Species = Pokemon.GetPokemon(name, form);
+            Lv = 50;
+            FixedGender = Gender.Genderless;
+            FixedNature = Nature.other;
+
+            _pidGenerator = new BasicPIDGenerator();
+        }
         internal GCSlot(string name, Gender gender, Nature nature)
         {
             Species = Pokemon.GetPokemon(name);
+            Lv = 50;
+            FixedGender = gender;
+            FixedNature = nature;
+
+            _pidGenerator = GetPIDGenerator(nature, Species, gender);
+        }
+        internal GCSlot(string name, string form, Gender gender, Nature nature)
+        {
+            Species = Pokemon.GetPokemon(name, form);
             Lv = 50;
             FixedGender = gender;
             FixedNature = nature;
