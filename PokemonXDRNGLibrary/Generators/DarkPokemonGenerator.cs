@@ -10,12 +10,8 @@ namespace PokemonXDRNGLibrary
         private readonly GCSlot _slot;
         private readonly ILcgConsumer<uint>[] _preGeneratePokemons;
 
-        private static readonly FirstCameraAngleGenerator _angleGenerator = new FirstCameraAngleGenerator();
-
         public GCIndividual Generate(uint seed, uint playerTSV = 0x10000)
         {
-            seed.Advance(_angleGenerator);
-
             seed.Advance(2); // enemyTSV
             foreach (var p in _preGeneratePokemons)
                 seed.Advance(p, playerTSV);

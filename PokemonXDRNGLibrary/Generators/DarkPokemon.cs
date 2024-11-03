@@ -68,7 +68,7 @@ namespace PokemonXDRNGLibrary
             return darkPokemon.Generate(seed, pTSV, criteria);
         }
 
-        private static readonly AngleReverser _angleReverser = new AngleReverser();
+        private static readonly FirstAngleReverser _angleReverser = new FirstAngleReverser();
         public IReadOnlyList<RNGTarget> CalcBack(uint H, uint A, uint B, uint C, uint D, uint S)
         {
             var resList = new List<RNGTarget>();

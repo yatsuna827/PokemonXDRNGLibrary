@@ -6,7 +6,7 @@ using PokemonPRNG.LCG32.GCLCG;
 
 namespace PokemonXDRNGLibrary
 {
-    public class AngleReverser
+    public class FirstAngleReverser
     {
         public IEnumerable<uint> Reverse(uint currentSeed)
         {
@@ -43,5 +43,51 @@ namespace PokemonXDRNGLibrary
                 }
             }
         }
+
+        public IEnumerable<uint> Reverse(uint currentSeed, AngleHistory history)
+        {
+            {
+                var seed = currentSeed.PrevSeed();
+                var r = seed.BackRand(10);
+                if (r < 5 && r != 3 && !history.Includes(r))
+                {
+                    do
+                    {
+                        yield return seed;
+                        r = seed.BackRand(10);
+                    }
+                    while (r == 3 || history.Includes(r));
+                }
+            }
+
+            {
+                var seed = currentSeed.PrevSeed(2);
+                var r = seed.BackRand(10);
+                if (r >= 5 && r != 8 && !history.Includes(r))
+                {
+                    do
+                    {
+                        yield return seed;
+                        r = seed.BackRand(10);
+                    }
+                    while (r == 3 || history.Includes(r));
+                }
+            }
+
+            {
+                var seed = currentSeed.PrevSeed(5);
+                var r = seed.BackRand(10);
+                if (r == 8 && !history.Includes(r))
+                {
+                    do
+                    {
+                        yield return seed;
+                        r = seed.BackRand(10);
+                    }
+                    while (r == 3 || history.Includes(r));
+                }
+            }
+        }
     }
+
 }

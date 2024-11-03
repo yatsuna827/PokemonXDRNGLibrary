@@ -8,19 +8,29 @@ using static System.Console;
 using System.Diagnostics;
 using PokemonStandardLibrary.Gen3;
 
-while (true)
+var seed = 0xE3DFC811u;
+var generator = new TeamGenerator(TeamGenerator.Greevil);
+var firstAngleGenerator = new FirstCameraAngleGenerator();
+for (int i=0; i< 10; i++)
 {
-    Hoge();
+    var _seed = seed.NextSeed(4);
+    var angle = firstAngleGenerator.Generate(ref _seed, new AngleHistory(0, 6));
+    var result = _seed.Generate(generator);
+
+    WriteLine($"{i} {seed:X8} {angle} {result[0].PID:X8} {string.Join("-", result[0].IVs)}");
+    WriteLine($"{i} {seed:X8} {angle} {result[1].PID:X8} {string.Join("-", result[1].IVs)}");
+
+    seed.Advance();
 }
 
 static void Hoge()
 {
-    var tama = XDRNGSystem.GetDarkPokemon("サンダー");
-    //foreach (var d in tama.PreGeneratePokemons.OfType<PreGenerateDarkPokemon>()) d.isFixed = true;
+    var tama = XDRNGSystem.GetDarkPokemon("サイドン");
+    // foreach (var d in tama.PreGeneratePokemons.Take(4).OfType<PreGenerateDarkPokemon>()) d.isFixed = true;
 
-    for (uint c = 0; c < 32; c++)
+    for (uint c = 0; c < 1; c++)
     {
-        foreach (var result in tama.CalcBack(31, 31, 31, c, 31, 31))
+        foreach (var result in tama.CalcBack(31, 31, 31, 31, 31, 31))
         {
             var id = result.ConditionedTSV == null ? $"{string.Join(",", result.ContraindicatedTSVs)}以外" : $"{result.ConditionedTSV}";
             WriteLine($"{result.representativeSeed:X8} {string.Join("-", result.targetIndividual.IVs)} {result.targetIndividual.Nature.ToJapanese()} TSV: {id}");
@@ -36,6 +46,43 @@ static void Hoge()
 
     WriteLine("おしり");
     ReadKey();
+}
+
+static uint RandomSeed(uint m, uint n)
+{
+    var random = new Random();
+    var rand = (uint)random.Next(0x10000) / m * m + n;
+    var seed = rand << 16 | (uint)random.Next(0x10000);
+    return seed.PrevSeed();
+}
+
+
+static GCIndividual[] Generate(uint seed, AngleHistory history)
+{
+    var firstAngleGenerator = new FirstCameraAngleGenerator();
+    var angleGenerator = new CameraAngleGenerator();
+
+    // 1回目のアングル変更
+    {
+        var r = angleGenerator.Generate(ref seed, history);
+        history = history.Next((byte)r);
+    }
+
+    // 2回目のアングル変更
+    {
+        var r = angleGenerator.Generate(ref seed, history);
+        history = history.Next((byte)r);
+    }
+
+    // 瞬きによる2消費 + マップロードでの9消費 + 戦闘突入時の4消費
+    seed.Advance(15);
+
+    WriteLine(history);
+
+    firstAngleGenerator.Generate(ref seed, history);
+
+    var generator = new TeamGenerator(TeamGenerator.Greevil);
+    return generator.Generate(seed);
 }
 
 class Class1 : IGeneratableEffectful<uint, uint>

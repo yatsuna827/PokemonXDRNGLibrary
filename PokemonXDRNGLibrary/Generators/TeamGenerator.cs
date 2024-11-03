@@ -10,14 +10,11 @@ namespace PokemonXDRNGLibrary
     public class TeamGenerator : IGeneratable<GCIndividual[]>
     {
         private readonly GCSlot[] _team;
-        private readonly FirstCameraAngleGenerator _angle;
-        public TeamGenerator(GCSlot[] team, FirstCameraAngleGenerator angleGenerator)
-            => (_team, _angle) = (team.Take(6).ToArray(), angleGenerator);
+        public TeamGenerator(GCSlot[] team)
+            => _team = team.Take(6).ToArray();
 
         public GCIndividual[] Generate(uint seed)
         {
-            seed.Advance(_angle);
-
             var dummyTSV = seed.GetRand() ^ seed.GetRand();
             return _team.Select(_ => _.Generate(ref seed)).ToArray();
         }
