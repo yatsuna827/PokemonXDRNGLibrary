@@ -173,7 +173,8 @@ namespace PokemonXDRNGLibrary.QuickBattle
 
                 for (int j = 0; j < 2; j++)
                 {
-                    dummy.Use(ref seed, tsv);
+                    var result = dummy.Generate(ref seed, _tsv);
+                    GenerateDummy(ref seed, ref tsv, result.PID);
                     seed.GenerateEVsDummy();
                 }
             }
