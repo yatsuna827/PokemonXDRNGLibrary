@@ -1,35 +1,32 @@
 
-using FsCheck;
-
 namespace Test
 {
     public class UnitTest1
     {
-        public static object[][] TestCases = new[]
+        public static readonly TheoryData<QuickBattleInput, QuickBattleInput, uint[]> TestCases = new()
         {
-            new object[]{
+            {
                 new QuickBattleInput(PlayerTeam.デオキシス, EnemyTeam.サンダー, 257, 648, 326, 281),
                 new QuickBattleInput(PlayerTeam.ジラーチ, EnemyTeam.サンダー, 349, 325, 336, 313),
-                new uint[] { 0x233F7EC1u, 0xF03F7EC1u }
+                [0x233F7EC1u, 0xF03F7EC1u]
             },
-            new object[]{
+            {
                 new QuickBattleInput(PlayerTeam.デオキシス, EnemyTeam.ファイヤー, 256, 650, 327, 256),
                 new QuickBattleInput(PlayerTeam.ミュウツー, EnemyTeam.フリーザー, 362, 349, 320, 388),
-                new uint[] { 0x4D1FFF4Du }
+                [0x4D1FFF4Du]
             },
-            new object[]
             {
                 new QuickBattleInput(PlayerTeam.ミュウ, EnemyTeam.フリーザー, 340, 335, 309, 344),
                 new QuickBattleInput(PlayerTeam.ミュウ, EnemyTeam.ラティアス, 357, 321, 289, 290),
-                new uint[] { 0x9F297767, 0x51297767, 0x03297767 }
+                [0x9F297767, 0x51297767, 0x03297767]
             }
         };
 
-        private static readonly XDDBClient client = new();
+        private static readonly XDDBClient client = new(PokemonXDRNGLibrary.XDDB.Data.XDDBSeeds.GetStream());
 
         [Theory]
         [MemberData(nameof(TestCases))]
-        public void Test1(QuickBattleInput first, QuickBattleInput second, IEnumerable<uint> expected)
+        public void Test1(QuickBattleInput first, QuickBattleInput second, uint[] expected)
         {
             var res = client.Search(first, second);
             Assert.Equal(expected.OrderBy(_ => _), res.OrderBy(_ => _));
@@ -40,7 +37,7 @@ namespace Test
         {
             var searcher = new QuickBattleSeedSearcher(client);
             var res = searcher.Next(new QuickBattleInput(PlayerTeam.ミュウ, EnemyTeam.フリーザー, 340, 335, 309, 344));
-            Assert.Equal(res, Array.Empty<uint>());
+            Assert.Equal(res, []);
             res = searcher.Next(new QuickBattleInput(PlayerTeam.ミュウ, EnemyTeam.ラティアス, 357, 321, 289, 290));
             Assert.Equal(res.OrderBy(_ => _), new uint[] { 0x9F297767, 0x51297767, 0x03297767 }.OrderBy(_ => _));
             res = searcher.Next(new QuickBattleInput(PlayerTeam.レックウザ, EnemyTeam.サンダー, 347, 241, 321, 293));
@@ -62,7 +59,7 @@ namespace Test
             _ralts = XDRNGSystem.GetDarkPokemon("ラルトス");
         }
 
-        [Theory, 
+        [Theory,
             InlineData(0x604DB56Eu),
             InlineData(0xD4E241C7u),
             InlineData(0x37E1798Au)]
@@ -70,10 +67,10 @@ namespace Test
         {
             var result = _zapdos.Generate(seed);
             Assert.Equal(0x3F3C705Eu, result.PID);
-            Assert.Equal(new uint[] { 30, 31, 31, 30, 31, 31 }, result.IVs);
+            Assert.Equal([30, 31, 31, 30, 31, 31], result.IVs);
         }
 
-        [Theory, 
+        [Theory,
             InlineData(0xE06758FDu),
             InlineData(0xF9B0EF42u),
             InlineData(0x68031769u)]
@@ -81,7 +78,7 @@ namespace Test
         {
             var result = _articuno.Generate(seed);
             Assert.Equal(0xC351DEF2u, result.PID);
-            Assert.Equal(new uint[] { 31, 31, 31, 31, 31, 31 }, result.IVs);
+            Assert.Equal([31, 31, 31, 31, 31, 31], result.IVs);
         }
 
         [Theory,
@@ -92,7 +89,7 @@ namespace Test
         {
             var result = _dragonite.Generate(seed);
             Assert.Equal(0xB1961329u, result.PID);
-            Assert.Equal(new uint[] { 31, 31, 31, 4, 31, 31 }, result.IVs);
+            Assert.Equal([31, 31, 31, 4, 31, 31], result.IVs);
         }
 
         [Theory,
@@ -101,11 +98,11 @@ namespace Test
         {
             var notBlocked = _ralts.Generate(seed);
             Assert.Equal(0x9D8707EBu, notBlocked.PID);
-            Assert.Equal(new uint[] { 31, 0, 31, 31, 31, 31 }, notBlocked.IVs);
+            Assert.Equal([31, 0, 31, 31, 31, 31], notBlocked.IVs);
 
             var blocked = _ralts.Generate(seed, 39528);
             Assert.Equal(0xED1D5D5Bu, blocked.PID);
-            Assert.Equal(new uint[] { 31, 0, 31, 31, 31, 31 }, blocked.IVs);
+            Assert.Equal([31, 0, 31, 31, 31, 31], blocked.IVs);
         }
 
     }
@@ -125,7 +122,7 @@ namespace Test
             var result = results[0];
             var expectedPID = 0xB1961329u;
             Assert.Equal(expectedPID, result.targetIndividual.PID);
-            Assert.Equal(new uint[] { 31, 31, 31, 4, 31, 31 }, result.targetIndividual.IVs);
+            Assert.Equal([31, 31, 31, 4, 31, 31], result.targetIndividual.IVs);
             Assert.Equal(280, result.generatableSeeds.Length);
             Assert.All(result.generatableSeeds, (_) =>
             {
@@ -147,7 +144,7 @@ namespace Test
             var expectedPID = 0x4EEEDFD5u;
 
             Assert.Equal(expectedPID, result.targetIndividual.PID);
-            Assert.Equal(new uint[] { 31, 31, 31, 4, 31, 31 }, result.targetIndividual.IVs);
+            Assert.Equal([31, 31, 31, 4, 31, 31], result.targetIndividual.IVs);
             Assert.Equal(280, result.generatableSeeds.Length);
             Assert.All(result.generatableSeeds, (_) =>
             {
@@ -168,7 +165,7 @@ namespace Test
             {
                 var expectedPID = result.ConditionedTSV == null ? 0xB1961329u : 0x4EEEDFD5u;
                 Assert.Equal(expectedPID, result.targetIndividual.PID);
-                Assert.Equal(new uint[] { 31, 31, 31, 4, 31, 31 }, result.targetIndividual.IVs);
+                Assert.Equal([31, 31, 31, 4, 31, 31], result.targetIndividual.IVs);
                 Assert.Equal(280, result.generatableSeeds.Length);
 
                 if (result.ConditionedTSV != null)
@@ -205,13 +202,11 @@ namespace Test
             Assert.Equal(new uint[] { 55120, 9184, 40056, 17120, 21216, 36480 }.OrderBy(_ => _), result.ContraindicatedTSVs.OrderBy(_ => _));
         }
 
-        public static IEnumerable<object[]> TestCasesOfTestReverseWeepinbellContraindicatedTSVs()
+        public static TheoryData<uint, uint[]> TestCasesOfTestReverseWeepinbellContraindicatedTSVs() => new()
         {
-            static object[] Case(uint c, uint[] expectedTSVs) => new object[] { c, expectedTSVs };
-
-            yield return Case(c: 6, expectedTSVs: new uint[] { 47136, 59448, 49144, 59696 });
-            yield return Case(c: 29, expectedTSVs: new uint[] { 40880, 23520, 62120 });
-        }
+            { 6, [47136, 59448, 49144, 59696] },
+            { 29, [40880, 23520, 62120] },
+        };
         [Theory]
         [MemberData(nameof(TestCasesOfTestReverseWeepinbellContraindicatedTSVs))]
         public void TestReverseWeepinbellContraindicatedTSVs(uint c, uint[] expectedTSVs)
@@ -238,10 +233,10 @@ namespace Test
             {
                 var result = results[0];
                 var expectedPID = 0x00296B0Du;
-                Assert.Equal(new uint[] { 9, 31, 31, 31, 31, 31 }, result.targetIndividual.IVs);
+                Assert.Equal([9, 31, 31, 31, 31, 31], result.targetIndividual.IVs);
                 Assert.Equal(expectedPID, result.targetIndividual.PID);
                 Assert.NotNull(result.ConditionedTSV);
-                var tsv = result.ConditionedTSV!.Value;
+                var tsv = result.ConditionedTSV.Value;
                 Assert.Equal(299, result.generatableSeeds.Length);
                 Assert.All(result.generatableSeeds, (_) =>
                 {
@@ -252,10 +247,10 @@ namespace Test
             {
                 var result = results[1];
                 var expectedPID = 0x5B07C9BFu;
-                Assert.Equal(new uint[] { 9, 31, 31, 31, 31, 31 }, result.targetIndividual.IVs);
+                Assert.Equal([9, 31, 31, 31, 31, 31], result.targetIndividual.IVs);
                 Assert.Equal(expectedPID, result.targetIndividual.PID);
                 Assert.NotNull(result.ConditionedTSV);
-                var tsv = result.ConditionedTSV!.Value;
+                var tsv = result.ConditionedTSV.Value;
                 Assert.Equal(402, result.generatableSeeds.Length);
                 Assert.All(result.generatableSeeds, (_) =>
                 {
@@ -277,10 +272,10 @@ namespace Test
 
             Assert.All(results, (result) =>
             {
-                Assert.Equal(new uint[] { 31, 31, 31, 31, 31, 31 }, result.targetIndividual.IVs);
+                Assert.Equal([31, 31, 31, 31, 31, 31], result.targetIndividual.IVs);
 
                 var r = rhydon.Generate(result.generatableSeeds[0], result.ConditionedTSV ?? 0x10000);
-                Assert.Equal(new uint[] { 31, 31, 31, 31, 31, 31 }, r.IVs);
+                Assert.Equal([31, 31, 31, 31, 31, 31], r.IVs);
             });
         }
 

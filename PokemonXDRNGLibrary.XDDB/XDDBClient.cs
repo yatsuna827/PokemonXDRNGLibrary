@@ -1,9 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.IO;
-using System.Threading.Tasks;
 using PokemonPRNG.LCG32.GCLCG;
 using PokemonPRNG.LCG32;
 using PokemonXDRNGLibrary.QuickBattle;
@@ -15,7 +13,7 @@ namespace PokemonXDRNGLibrary.XDDB
         public byte PlayerTeam { get; }
         public byte EnemyTeam { get; }
         public uint HPCode { get; }
-        public bool Check(uint pIndex, uint eIndex, uint hpCode) 
+        public bool Check(uint pIndex, uint eIndex, uint hpCode)
             => hpCode == HPCode && pIndex == PlayerTeam && eIndex == EnemyTeam;
 
         private static readonly (uint First, uint Second)[] pBaseHP = new (uint First, uint Second)[]
@@ -46,38 +44,55 @@ namespace PokemonXDRNGLibrary.XDDB
             HPCode = (eFirstHP << 24) | (eSecondHP << 16) | (pFirstHP << 8) | pSecondHP;
         }
     }
+
     public class XDDBClient
     {
-        private readonly List<uint> hpData, seedData;
+        private static readonly RecSplitMph mph = new RecSplitMph(
+            XDDBIndex.N, XDDBIndex.BucketSize, XDDBIndex.BitOffset, XDDBIndex.Bits);
 
-        public XDDBClient()
+        private readonly uint[] seeds;
+
+        public XDDBClient(Stream seedsStream)
         {
-            var hp = new List<uint>();
-            var seed = new List<uint>();
+            seeds = LoadSeeds(seedsStream, mph.Count);
+        }
 
-            using (var br = new BinaryReader(new MemoryStream(Properties.Resources.XDDB)))
+        private static uint[] LoadSeeds(Stream stream, int count)
+        {
+            using (var br = new BinaryReader(stream))
             {
-                var bs = br.BaseStream;
-                while (bs.Position != bs.Length)
-                {
-                    hp.Add(br.ReadUInt32());
-                    seed.Add(br.ReadUInt32());
-                }
+                var seeds = new uint[count];
+                for (int i = 0; i < count; i++)
+                    seeds[i] = ReadU24(br);
+                return seeds;
             }
+        }
 
-            (this.hpData, this.seedData) = (hp, seed);
+        private static uint ReadU24(BinaryReader br)
+            => (uint)(br.ReadByte() | br.ReadByte() << 8 | br.ReadByte() << 16);
+
+        private IEnumerable<uint> GetCandidateSeeds(uint key)
+        {
+            var slot = mph.Lookup(key);
+            yield return seeds[slot];
+
+            var ovSlots = XDDBIndex.OverflowSlots;
+            var ovSeeds = XDDBIndex.OverflowSeeds;
+            var idx = Array.BinarySearch(ovSlots, (uint)slot);
+            if (idx >= 0)
+            {
+                for (int i = idx; i >= 0 && ovSlots[i] == slot; i--)
+                    yield return ovSeeds[i];
+                for (int i = idx + 1; i < ovSlots.Length && ovSlots[i] == slot; i++)
+                    yield return ovSeeds[i];
+            }
         }
 
         public IEnumerable<uint> Search(QuickBattleInput first, QuickBattleInput second)
         {
-            var key = first.HPCode;
-            var idx = hpData.BinarySearch(key);
-            if (idx < 0) yield break;
-
             var hasSeen = new HashSet<uint>();
-            for (int i = idx; hpData[i] == key && i >= 0; i--)
+            foreach (var seed in GetCandidateSeeds(first.HPCode))
             {
-                var seed = seedData[i];
                 for (uint h8 = 0; h8 < 0x100; h8++)
                 {
                     var res = (h8 << 24 | seed).GenerateQuickBattle();
@@ -91,25 +106,7 @@ namespace PokemonXDRNGLibrary.XDDB
                     yield return next.seed;
                 }
             }
-            for (int i = idx + 1; hpData[i] == key && i < hpData.Count; i++)
-            {
-                var seed = seedData[i];
-                for (uint h8 = 0; h8 < 0x100; h8++)
-                {
-                    var res = (h8 << 24 | seed).GenerateQuickBattle();
-                    var next = res.seed.GenerateQuickBattle();
-
-                    if (!first.Check(res.pIndex, res.eIndex, res.HP)) continue;
-                    if (!second.Check(next.pIndex, next.eIndex, next.HP)) continue;
-                    if (hasSeen.Contains(next.seed)) continue;
-
-                    hasSeen.Add(next.seed);
-                    yield return next.seed;
-                }
-            }
-
         }
-
     }
 
     static class EVsExt

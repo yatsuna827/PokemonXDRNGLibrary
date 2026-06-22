@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PokemonXDRNGLibrary\PokemonXDRNGLibrary.csproj" />
+    <EmbeddedResource Include="Resources\seeds.bin" />
   </ItemGroup>
 
 </Project>
