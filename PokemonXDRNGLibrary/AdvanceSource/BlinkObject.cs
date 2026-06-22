@@ -17,6 +17,21 @@ namespace PokemonXDRNGLibrary.AdvanceSource
             _blinkCounter = initialCounter; 
             _remainCoolTime = 0;
         }
+        public bool CountUp(ref uint seed)
+        {
+            if (_remainCoolTime-- > 0) return false; // マイナスに振り切るぶんには問題ないので.
+            if (_blinkCounter++ < 10) return false;
+
+            var rand = seed.GetRand();
+            if (_blinkCounter < 180 && rand >= BlinkConst.blinkThresholds[_blinkCounter - 10]) return false;
+            // 実際は停滞によってカウンタが満期までが延びているので、その分を遅らせる
+            if (180 <= _blinkCounter && _blinkCounter < 180 + _delayAtMaturity) return false;
+
+            _blinkCounter = 0;
+            _remainCoolTime = _coolTime;
+
+            return true;
+        }
         public bool CountUp(ref uint seed, ref uint index)
         {
             if (_remainCoolTime-- > 0) return false; // マイナスに振り切るぶんには問題ないので.
@@ -44,23 +59,15 @@ namespace PokemonXDRNGLibrary.AdvanceSource
     public class BlinkObjectEnumeratorHanlder : ISeedEnumeratorHandler, IActionSequenceEnumeratorHandler
     {
         private uint _index;
-        private readonly int[] _initialCounterValues;
-        private readonly BlinkObject[] _blinkObjects;
-        private readonly Func<bool[], bool> _actionSelector;
+        private readonly int _initialCounterValue;
+        private readonly BlinkObject _blinkObject;
 
-        public BlinkObjectEnumeratorHanlder(params BlinkObject[] blinkObjects)
+        public BlinkObjectEnumeratorHanlder(BlinkObject blinkObjects)
         {
-            _blinkObjects = blinkObjects;
-            _initialCounterValues = blinkObjects.Select(_ => _.Counter).ToArray();
-            _actionSelector = (_) => _[0];
+            _blinkObject = blinkObjects;
+            _initialCounterValue = blinkObjects.Counter;
         }
-        public BlinkObjectEnumeratorHanlder(Func<bool[], bool> actionSelector, params BlinkObject[] blinkObjects)
-        {
-            _blinkObjects = blinkObjects;
-            _initialCounterValues = blinkObjects.Select(_ => _.Counter).ToArray();
-            _actionSelector = actionSelector;
-        }
-
+       
         public uint SelectCurrent(uint seed) => seed;
 
         public uint Advance(uint seed)
@@ -71,18 +78,12 @@ namespace PokemonXDRNGLibrary.AdvanceSource
 
         public bool RollForAction(ref uint seed)
         {
-            var actions = new bool[_blinkObjects.Length];
-            for (var i = 0; i < _blinkObjects.Length; i++)
-                actions[i] = _blinkObjects[i].CountUp(ref seed, ref _index);
-
-            return _actionSelector(actions);
+            return _blinkObject.CountUp(ref seed, ref _index);
         }
 
         public uint Initialize(uint seed)
         {
-            foreach (var (obj, cnt) in _blinkObjects.Zip(_initialCounterValues, (obj, cnt) => (obj, cnt)))
-                obj.Initialize(cnt);
-
+            _blinkObject.Initialize(_initialCounterValue);
             return seed;
         }
     }

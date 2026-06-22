@@ -87,6 +87,7 @@ namespace PokemonXDRNGLibrary.AdvanceSource
             {
                 while (child != null && !child.IsLiving) this.child = child.child;
             }
+
         }
 
         class MainCounter : MapObjectCounter
@@ -109,39 +110,8 @@ namespace PokemonXDRNGLibrary.AdvanceSource
                 child?.CountUp(ref seed);
             }
 
-            public void SimulateCountUp(ref uint seed)
-            {
-                var v = Value + seed.GetRand_f() * coefficient;
-                if (v >= 1.0f)
-                {
-                    seed.Advance();
-                    // サブカウンタが生える.
-                    // 初期化 + 直後に加算処理が入り, 繰り上げが発生したらさらに1消費.
-                    if (seed.GetRand_f() + seed.GetRand_f() * 0.5f >= 1.0f) seed.Advance();
-                }
-
-                child?.SimulateCountUp(ref seed);
-            }
-
-            public void SimulateCountUp(ref uint seed, SubCounter[] subordinateCounters)
-            {
-                var v = Value + seed.GetRand_f() * coefficient;
-                if (v >= 1.0f)
-                {
-                    seed.Advance();
-                    // サブカウンタが生える.
-                    // 初期化 + 直後に加算処理が入り, 繰り上げが発生したらさらに1消費.
-                    if (seed.GetRand_f() + seed.GetRand_f() * 0.5f >= 1.0f) seed.Advance();
-                }
-
-                // 遅延で生えたカウンタの加算処理.
-                foreach (var sub in subordinateCounters)
-                    sub.SimulateCountUp(ref seed);
-
-                child?.SimulateCountUp(ref seed);
-            }
-
             public MainCounter(Action onCarried) : base(0.01f) => this.onCarried = onCarried;
+
         }
 
         class SubCounter : MapObjectCounter
@@ -172,20 +142,8 @@ namespace PokemonXDRNGLibrary.AdvanceSource
                 child?.CountUp(ref seed);
             }
 
-            public void SimulateCountUp(ref uint seed)
-            {
-                if (IsLiving)
-                {
-                    if (lifetime == 0)
-                        seed.Advance();
-                    else if (Value + seed.GetRand_f() * coefficient >= 1.0f)
-                        seed.Advance();
-                }
-
-                child?.SimulateCountUp(ref seed);
-            }
-
             public SubCounter(ref uint seed) : base(0.5f, seed.GetRand_f()) => lifetime = 50;
+
         }
     
         public override string ToString()
