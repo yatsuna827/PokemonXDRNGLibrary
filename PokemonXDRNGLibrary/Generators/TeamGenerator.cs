@@ -7,7 +7,7 @@ using PokemonPRNG.LCG32.GCLCG;
 
 namespace PokemonXDRNGLibrary
 {
-    public class TeamGenerator : IGeneratable<GCIndividual[]>
+    public class TeamGenerator : IGeneratable<GCIndividual[]>, IGeneratable<GCIndividual[], uint>
     {
         private readonly GCSlot[] _team;
         public TeamGenerator(GCSlot[] team)
@@ -17,6 +17,12 @@ namespace PokemonXDRNGLibrary
         {
             var dummyTSV = seed.GetRand() ^ seed.GetRand();
             return _team.Select(_ => _.Generate(ref seed)).ToArray();
+        }
+
+        public GCIndividual[] Generate(uint seed, uint tsv)
+        {
+            var dummyTSV = seed.GetRand() ^ seed.GetRand();
+            return _team.Select(_ => _.Generate(ref seed, tsv)).ToArray();
         }
 
         public static GCSlot[] Greevil

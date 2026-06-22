@@ -49,7 +49,7 @@ namespace PokemonXDRNGLibrary.AdvancePlanning
     public class MenuAdvancePlanner
     {
         private readonly Dictionary<Menus, Dictionary<Menus, Func<uint, uint>>> graph;
-        private readonly QuickBattleGenerator qbGenerator;
+        private readonly QuickBattlePvEGenerator qbGenerator;
         private readonly GroupBattleGenerator gbGenerator;
         private HashSet<(Menus, uint)> attemptedPaths = new HashSet<(Menus, uint)>();
         private List<Queue<MenuInput>> paths = new List<Queue<MenuInput>>();
@@ -114,7 +114,7 @@ namespace PokemonXDRNGLibrary.AdvancePlanning
                 }
             };
 
-            qbGenerator = new QuickBattleGenerator(tsv);
+            qbGenerator = new QuickBattlePvEGenerator(tsv);
             gbGenerator = new GroupBattleGenerator(tsv);
         }
 
@@ -200,58 +200,5 @@ namespace PokemonXDRNGLibrary.AdvancePlanning
             }
         }
 
-
-        #region old implementation without struct
-
-        [Obsolete]
-        public List<Queue<MenuInput>> FindPaths_Old(uint startSeed, uint targetAdvances, bool palVersion, Menus start, uint maxNameScreens, uint maxRumbleSaves, CancellationToken token)
-        {
-            var path = new Queue<MenuInput>();
-            attemptedPaths?.Clear();
-            paths?.Clear();
-            uint rumbleSaves = 0;
-            uint nameScreens = 0;
-
-            FindPaths_Old(startSeed, targetAdvances, palVersion, start, maxRumbleSaves, maxNameScreens, rumbleSaves, nameScreens, path, token);
-
-            return paths;
-        }
-
-        [Obsolete]
-        private void FindPaths_Old(uint startSeed, uint targetAdvances, bool palVersion, Menus start, uint maxRumbleSaves, uint maxNameScreens, uint rumbleSaves, uint nameScreens, Queue<MenuInput> path, CancellationToken token)
-        {
-            if (token.IsCancellationRequested) return;
-            foreach (var route in graph[start])
-            {
-                // already tried this option from this seed -> each path only gets checked once
-                if (!attemptedPaths.Add((route.Key, startSeed)))
-                    continue;
-                // this can be as high as it wants and by using x++ instead of ++x it avoids and off by 1 scenario for ==
-                if (route.Key == Menus.RumbleSave && rumbleSaves++ >= maxRumbleSaves)
-                    continue;
-                // this can be as high as it wants and by using x++ instead of ++x it avoids and off by 1 scenario for ==
-                else if (route.Key == Menus.Namescreen && (!palVersion || nameScreens++ >= maxNameScreens))
-                    continue;
-
-                var currentPath = new Queue<MenuInput>(path);
-
-                uint nextSeed = route.Value(startSeed);
-                uint advances = nextSeed.GetIndex(startSeed);
-
-                currentPath.Enqueue(new MenuInput(route.Key, advances, nextSeed));
-
-                long sum = currentPath.Sum(_ => _.Advances);
-
-                if (sum == targetAdvances)
-                    paths.Add(currentPath);
-                else if (sum > targetAdvances)
-                    continue;
-                else
-                    FindPaths_Old(nextSeed, targetAdvances, palVersion, route.Key, maxRumbleSaves, maxNameScreens, rumbleSaves, nameScreens, currentPath, token);
-            }
-
-        }
-
-        #endregion
     }
 }
